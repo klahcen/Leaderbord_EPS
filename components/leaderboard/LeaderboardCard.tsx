@@ -6,6 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 import type { LeaderboardEntry } from "@/types";
 
+function scoreClass(avg: number) {
+  if (avg >= 80) return "high";
+  if (avg >= 50) return "medium";
+  return "low";
+}
+
 export function LeaderboardCardList({ students }: { students: LeaderboardEntry[] }) {
   const format = useFormatter();
 
@@ -31,10 +37,10 @@ export function LeaderboardCardList({ students }: { students: LeaderboardEntry[]
           <div className="flex-1">
             <p className="font-medium">{student.name}</p>
             <p className="text-xs text-muted-foreground">{student.className}</p>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-              <div
-                className="score-bar h-full rounded-full bg-primary"
-                style={{ width: `${Math.min(student.avgScore, 100)}%` }}
+            <div className="score-bar-track mt-2">
+              <span
+                className={`score-bar-fill ${scoreClass(student.avgScore)}`}
+                style={{ width: `${Math.min(Math.max(student.avgScore, 0), 100)}%` }}
               />
             </div>
           </div>

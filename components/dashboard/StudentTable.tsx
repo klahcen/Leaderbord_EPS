@@ -53,10 +53,10 @@ export function StudentTable({ students }: { students: StudentRow[] }) {
               <td className="px-4 py-3">{student.className}</td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-20 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="score-bar h-full rounded-full bg-primary"
-                      style={{ width: `${Math.min(student.avgScore, 100)}%` }}
+                  <div className="score-bar-track w-24">
+                    <span
+                      className={`score-bar-fill ${student.avgScore >= 80 ? "high" : student.avgScore >= 50 ? "medium" : "low"}`}
+                      style={{ width: `${Math.min(Math.max(student.avgScore, 0), 100)}%` }}
                     />
                   </div>
                   <span>

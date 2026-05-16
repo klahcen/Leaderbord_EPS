@@ -70,17 +70,18 @@ export function LeaderboardTable({ students }: { students: LeaderboardEntry[] })
                 <span className="badge-neutral">{student.className}</span>
               </td>
               <td>
-                <span className="score-bar">
-                  <span className="score-bar-track">
+                <div className="score-bar">
+                  <div className="score-bar-track" role="presentation">
                     <span
                       className={`score-bar-fill ${scoreClass(student.avgScore)}`}
-                      style={{ width: `${Math.min(student.avgScore, 100)}%` }}
+                      style={{ width: `${Math.min(Math.max(student.avgScore, 0), 100)}%` }}
+                      title={`${format.number(student.avgScore, { maximumFractionDigits: 1 })}%`}
                     />
-                  </span>
-                  <strong className="min-w-[2.5rem] text-right">
+                  </div>
+                  <strong className="min-w-[3rem] shrink-0 text-right tabular-nums">
                     {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
                   </strong>
-                </span>
+                </div>
               </td>
               <td>
                 <TrendCell trend={student.trend} />

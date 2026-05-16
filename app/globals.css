@@ -485,18 +485,21 @@
 
 .score-bar-track {
   flex: 1;
-  height: 8px;
+  height: 10px;
   background: var(--color-surface-offset-2);
   border-radius: var(--radius-full);
   overflow: hidden;
-  min-width: 6rem;
+  min-width: 7rem;
+  max-width: 10rem;
 }
 
 .score-bar-fill {
+  display: block;
   height: 100%;
+  min-width: 2px;
   border-radius: var(--radius-full);
   background: var(--color-primary);
-  animation: scoreFill 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .score-bar-fill.high {
@@ -509,12 +512,6 @@
 
 .score-bar-fill.low {
   background: var(--color-error);
-}
-
-@keyframes scoreFill {
-  from {
-    width: 0;
-  }
 }
 
 /* ── Leaderboard: AI + Podium row ── */
