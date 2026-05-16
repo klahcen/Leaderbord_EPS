@@ -98,7 +98,7 @@ export default async function DashboardPage() {
         <WeeklyReportButton />
       </Header>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="kpi-grid">
         <StatsCard
           title={t("totalStudents")}
           value={data.totalStudents}
@@ -113,6 +113,7 @@ export default async function DashboardPage() {
           title={t("avgScore")}
           value={`${format.number(data.classAvg, { maximumFractionDigits: 1 })}%`}
           icon={TrendingUp}
+          highlight
         />
         <StatsCard
           title={t("topStudent")}
@@ -128,7 +129,7 @@ export default async function DashboardPage() {
           }
           icon={Award}
         />
-      </div>
+      </section>
 
       <div className="mb-8 grid gap-6 lg:grid-cols-2">
         <Card>

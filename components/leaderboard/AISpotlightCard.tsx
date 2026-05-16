@@ -11,14 +11,12 @@ export async function AISpotlightCard({ insights }: AISpotlightCardProps) {
   if (!insights) return null;
 
   return (
-    <div className="ai-spotlight-card mb-8 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/10 to-primary/5 p-6">
-      <div className="mb-3 flex items-center gap-2">
-        <Sparkles className="h-5 w-5 text-primary" />
-        <span className="rounded-full bg-primary px-3 py-0.5 text-xs font-semibold text-primary-foreground">
-          {t("aiSpotlight")}
-        </span>
-      </div>
-      <p className="text-sm leading-relaxed">{insights}</p>
-    </div>
+    <section className="ai-panel">
+      <span className="ai-panel-label">
+        <Sparkles className="h-4 w-4" aria-hidden />
+        {t("aiSpotlight")}
+      </span>
+      <p className="ai-panel-body">{insights}</p>
+    </section>
   );
 }

@@ -22,7 +22,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
       <body
-        className={`min-h-screen antialiased ${locale === "ar" ? "font-arabic" : ""}`}
+        className={`min-h-screen font-sans antialiased ${locale === "ar" ? "font-arabic" : ""}`}
       >
         <NextIntlClientProvider messages={messages}>
           <SessionProvider>

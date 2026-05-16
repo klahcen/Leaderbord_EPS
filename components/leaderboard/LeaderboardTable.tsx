@@ -1,92 +1,94 @@
 "use client";
 
 import { useTranslations, useFormatter } from "next-intl";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 import type { LeaderboardEntry } from "@/types";
 
-function TrendBadge({ trend }: { trend: "up" | "down" | "stable" }) {
+function scoreClass(avg: number) {
+  if (avg >= 80) return "high";
+  if (avg >= 50) return "medium";
+  return "low";
+}
+
+function TrendCell({ trend }: { trend: "up" | "down" | "stable" }) {
   const t = useTranslations("leaderboard");
 
-  if (trend === "up")
-    return (
-      <span className="inline-flex items-center gap-1 text-green-600">
-        <TrendingUp className="h-3 w-3" /> {t("trendUp")}
-      </span>
-    );
-  if (trend === "down")
-    return (
-      <span className="inline-flex items-center gap-1 text-red-600">
-        <TrendingDown className="h-3 w-3" /> {t("trendDown")}
-      </span>
-    );
-  return (
-    <span className="inline-flex items-center gap-1 text-gray-400">
-      <Minus className="h-3 w-3" /> {t("trendStable")}
-    </span>
-  );
+  if (trend === "up") {
+    return <span className="trend up">↑ {t("trendUp")}</span>;
+  }
+  if (trend === "down") {
+    return <span className="trend down">↓ {t("trendDown")}</span>;
+  }
+  return <span className="trend stable">→ {t("trendStable")}</span>;
 }
 
 export function LeaderboardTable({ students }: { students: LeaderboardEntry[] }) {
   const t = useTranslations("leaderboard");
   const format = useFormatter();
 
+  const medal = (rank: number) =>
+    rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
+
   return (
-    <div className="mb-8 hidden overflow-x-auto rounded-lg border md:block">
-      <table className="w-full text-sm">
+    <section className="mb-8 hidden overflow-x-auto md:block">
+      <table className="data-table">
         <thead>
-          <tr className="border-b bg-muted/50">
-            <th className="px-4 py-3 text-left font-medium">{t("rank")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("student")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("class")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("score")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("trend")}</th>
+          <tr>
+            <th>{t("rank")}</th>
+            <th>{t("student")}</th>
+            <th>{t("class")}</th>
+            <th>{t("score")}</th>
+            <th>{t("trend")}</th>
           </tr>
         </thead>
         <tbody>
           {students.map((student) => (
-            <tr key={student.id} className="border-b hover:bg-muted/30">
-              <td className="px-4 py-3 font-bold">#{student.rank}</td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback>
-                      {student.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{student.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {student.studentCode}
-                    </p>
-                  </div>
-                </div>
+            <tr key={student.id}>
+              <td>
+                <strong>{medal(student.rank) ?? `#${student.rank}`}</strong>
               </td>
-              <td className="px-4 py-3">{student.className}</td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="score-bar h-full rounded-full bg-primary"
+              <td>
+                <span className="flex items-center gap-3">
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold"
+                    aria-hidden
+                  >
+                    {student.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)}
+                  </span>
+                  <span>
+                    <span className="block font-semibold">{student.name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {student.studentCode}
+                    </span>
+                  </span>
+                </span>
+              </td>
+              <td>
+                <span className="badge-neutral">{student.className}</span>
+              </td>
+              <td>
+                <span className="score-bar">
+                  <span className="score-bar-track">
+                    <span
+                      className={`score-bar-fill ${scoreClass(student.avgScore)}`}
                       style={{ width: `${Math.min(student.avgScore, 100)}%` }}
                     />
-                  </div>
-                  <span className="font-semibold">
-                    {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
                   </span>
-                </div>
+                  <strong className="min-w-[2.5rem] text-right">
+                    {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
+                  </strong>
+                </span>
               </td>
-              <td className="px-4 py-3">
-                <TrendBadge trend={student.trend} />
+              <td>
+                <TrendCell trend={student.trend} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   );
 }

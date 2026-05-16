@@ -8,6 +8,7 @@ import { Podium } from "@/components/leaderboard/Podium";
 import { LeaderboardTable } from "@/components/leaderboard/LeaderboardTable";
 import { LeaderboardCardList } from "@/components/leaderboard/LeaderboardCard";
 import { AISpotlightCard } from "@/components/leaderboard/AISpotlightCard";
+import { LeaderboardHero } from "@/components/leaderboard/LeaderboardHero";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/providers/ThemeProvider";
@@ -30,8 +31,8 @@ export default async function LeaderboardPage({
 }: {
   searchParams: { category?: string };
 }) {
-  const t = await getTranslations("leaderboard");
   const locale = await getLocale();
+  const t = await getTranslations("leaderboard");
   const category = searchParams.category ?? "ALL";
 
   const [students, insights] = await Promise.all([
@@ -41,12 +42,11 @@ export default async function LeaderboardPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="border-b bg-card">
+      <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <div>
-            <h1 className="text-2xl font-bold text-primary">{t("title")}</h1>
-            <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
-          </div>
+          <Link href="/leaderboard" className="sidebar-logo !p-0 text-base md:text-lg">
+            PE <span>Sport</span>
+          </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
@@ -58,9 +58,16 @@ export default async function LeaderboardPage({
       </header>
 
       <div className="mx-auto max-w-5xl px-6 py-8">
+        <LeaderboardHero />
         <CategoryFilter active={category} />
-        <AISpotlightCard insights={insights} />
-        <Podium top3={students.slice(0, 3)} />
+        <section
+          className={`leaderboard-spotlight-row${insights ? "" : " leaderboard-spotlight-row--solo"}`}
+        >
+          {insights ? <AISpotlightCard insights={insights} /> : null}
+          <div className="leaderboard-podium-wrap">
+            <Podium top3={students.slice(0, 3)} />
+          </div>
+        </section>
         <LeaderboardTable students={students} />
         <LeaderboardCardList students={students} />
       </div>

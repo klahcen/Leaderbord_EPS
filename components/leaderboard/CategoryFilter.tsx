@@ -22,21 +22,16 @@ export function CategoryFilter({ active }: { active: string }) {
   const t = useTranslations("categories");
 
   return (
-    <div className="mb-6 flex flex-wrap gap-2">
+    <nav className="category-tabs" aria-label="Category filter">
       {categories.map((cat) => (
         <Link
           key={cat}
           href={cat === "ALL" ? pathname : `${pathname}?category=${cat}`}
-          className={cn(
-            "rounded-full px-3 py-1 text-sm font-medium transition-colors",
-            active === cat
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:bg-accent"
-          )}
+          className={cn("category-tab", active === cat && "active")}
         >
           {t(cat)}
         </Link>
       ))}
-    </div>
+    </nav>
   );
 }

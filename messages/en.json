@@ -93,6 +93,9 @@
   },
   "leaderboard": {
     "title": "Class Leaderboard",
+    "heroTitle": "Class",
+    "heroHighlight": "Leaderboard",
+    "heroSubtitle": "Track student performance across all Physical Education activities",
     "subtitle": "Live rankings · refreshes every 30 seconds",
     "rank": "Rank",
     "student": "Student",
@@ -123,6 +126,11 @@
   "auth": {
     "login": "Login",
     "appTitle": "PE Dashboard",
+    "welcomeBack": "Welcome back 👋",
+    "loginHeadlineLine1": "Track every",
+    "loginHeadlineEm1": "victory",
+    "loginHeadlineLine2": "Celebrate every",
+    "loginHeadlineEm2": "step",
     "professorSignIn": "Professor sign in",
     "email": "Email",
     "password": "Password",

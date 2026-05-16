@@ -93,6 +93,9 @@
   },
   "leaderboard": {
     "title": "لوحة ترتيب الصف",
+    "heroTitle": "لوحة",
+    "heroHighlight": "الترتيب",
+    "heroSubtitle": "تتبع أداء الطلاب في جميع أنشطة التربية البدنية",
     "subtitle": "ترتيب مباشر · يتحدث كل 30 ثانية",
     "rank": "الترتيب",
     "student": "الطالب",
@@ -123,6 +126,11 @@
   "auth": {
     "login": "تسجيل الدخول",
     "appTitle": "لوحة التربية البدنية",
+    "welcomeBack": "مرحباً بعودتك 👋",
+    "loginHeadlineLine1": "تتبع كل",
+    "loginHeadlineEm1": "انتصار",
+    "loginHeadlineLine2": "احتفل بكل",
+    "loginHeadlineEm2": "خطوة",
     "professorSignIn": "دخول الأستاذ",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",

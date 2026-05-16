@@ -9,15 +9,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="dashboard-layout">
       <Sidebar />
-      <main className="flex-1 overflow-auto pb-20 md:pb-0">
-        <div className="flex items-center justify-end gap-3 border-b px-6 py-3">
+      <div className="flex min-h-screen flex-1 flex-col pb-20 md:pb-0">
+        <div className="dashboard-topbar">
           <LanguageSwitcher />
           <ThemeToggle />
         </div>
-        <div className="p-6">{children}</div>
-      </main>
+        <main className="dashboard-content flex-1 overflow-auto">{children}</main>
+      </div>
       <AIChatWidget />
     </div>
   );

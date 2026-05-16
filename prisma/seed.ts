@@ -7,12 +7,12 @@ const categories = Object.values(Category);
 
 async function main() {
   const professor = await prisma.user.upsert({
-    where: { email: "prof@pe.school" },
+    where: { email: "Aya@sefyani.lakrizi" },
     update: {},
     create: {
-      name: "Prof. Ali Alouch",
-      email: "prof@pe.school",
-      password: await bcrypt.hash("password123", 10),
+      name: "Prof. Aya SEFYANI LAKRIZI",
+      email: "Aya@sefyani.lakrizi",
+      password: await bcrypt.hash("LAHCEN@AYA2026", 10),
       role: "PROFESSOR",
     },
   });

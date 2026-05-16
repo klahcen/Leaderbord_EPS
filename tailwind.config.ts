@@ -8,6 +8,15 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Figtree", "Inter", "system-ui", "sans-serif"],
+        display: ["Figtree", "Inter", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        xl: "var(--radius-xl)",
+        lg: "var(--radius-lg)",
+        full: "var(--radius-full)",
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

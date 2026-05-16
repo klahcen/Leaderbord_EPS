@@ -93,6 +93,9 @@
   },
   "leaderboard": {
     "title": "Classement de la classe",
+    "heroTitle": "Classement",
+    "heroHighlight": "de la classe",
+    "heroSubtitle": "Suivez les performances des élèves dans toutes les activités d'éducation physique",
     "subtitle": "Classement en direct · actualisation toutes les 30 secondes",
     "rank": "Rang",
     "student": "Élève",
@@ -123,6 +126,11 @@
   "auth": {
     "login": "Connexion",
     "appTitle": "Tableau PE",
+    "welcomeBack": "Bon retour 👋",
+    "loginHeadlineLine1": "Suivez chaque",
+    "loginHeadlineEm1": "victoire",
+    "loginHeadlineLine2": "Célébrez chaque",
+    "loginHeadlineEm2": "progrès",
     "professorSignIn": "Connexion professeur",
     "email": "E-mail",
     "password": "Mot de passe",
