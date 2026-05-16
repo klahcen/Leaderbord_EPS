@@ -1,9 +1,10 @@
 # PE Dashboard — local dev & Railway deploy helpers
-# Railway: set Build Command to `make build`, Start Command to `make railway-start`
+# Railway: uses Dockerfile (see railway.toml) — push to GitHub to redeploy
 
 .PHONY: help install lock dev build start lint \
         db-generate db-push db-seed db-studio \
-        railway-build railway-start env-check
+        railway-build railway-start env-check \
+        docker-build docker-run
 
 NPM ?= npm
 
@@ -52,3 +53,9 @@ env-check: ## Print which required env vars are set (values hidden)
 	@echo "AUTH_SECRET:         $$([ -n \"$$AUTH_SECRET\" ] && echo set || echo MISSING)"
 	@echo "ANTHROPIC_API_KEY:   $$([ -n \"$$ANTHROPIC_API_KEY\" ] && echo set || echo MISSING)"
 	@echo "AUTH_URL (optional): $$([ -n \"$$AUTH_URL\" ] && echo set || echo not set)"
+
+docker-build: ## Build Docker image locally
+	docker build -t pe-dashboard .
+
+docker-run: ## Run Docker image (requires .env or -e flags)
+	docker run --rm -p 3000:3000 --env-file .env pe-dashboard
