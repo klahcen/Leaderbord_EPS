@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PROFESSOR
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum Category {
+  RUNNING
+  JUMPING
+  SWIMMING
+  STRENGTH
+  FLEXIBILITY
+  ENDURANCE
+  COORDINATION
+  TEAMWORK
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(PROFESSOR)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  progressLogs ProgressLog[]
+}
+
+model Student {
+  id           String        @id @default(cuid())
+  name         String
+  studentCode  String        @unique
+  className    String
+  age          Int?
+  gender       Gender?
+  avatarUrl    String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  progressLogs ProgressLog[]
+}
+
+model ProgressLog {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  professorId String
+  professor   User     @relation(fields: [professorId], references: [id])
+  category    Category
+  score       Float
+  maxScore    Float    @default(100)
+  notes       String?
+  recordedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([professorId])
+  @@index([category])
+  @@index([recordedAt])
+}

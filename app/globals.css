@@ -1,0 +1,115 @@
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #faf9f7;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --primary: #01696f;
+  --primary-foreground: #ffffff;
+  --secondary: #f0eeeb;
+  --secondary-foreground: #1a1a1a;
+  --muted: #f0eeeb;
+  --muted-foreground: #6b6b6b;
+  --accent: #e8f4f4;
+  --accent-foreground: #01696f;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e5e2dd;
+  --input: #e5e2dd;
+  --ring: #01696f;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+}
+
+[data-theme="dark"] {
+  --background: #0f1414;
+  --foreground: #ededed;
+  --card: #1a2222;
+  --card-foreground: #ededed;
+  --primary: #02a0a9;
+  --primary-foreground: #ffffff;
+  --secondary: #252d2d;
+  --secondary-foreground: #ededed;
+  --muted: #252d2d;
+  --muted-foreground: #a0a0a0;
+  --accent: #1a3333;
+  --accent-foreground: #02a0a9;
+  --border: #2d3838;
+  --input: #2d3838;
+  --popover: #1a2222;
+  --popover-foreground: #ededed;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0f1414;
+    --foreground: #ededed;
+    --card: #1a2222;
+    --card-foreground: #ededed;
+    --primary: #02a0a9;
+    --primary-foreground: #ffffff;
+    --secondary: #252d2d;
+    --secondary-foreground: #ededed;
+    --muted: #252d2d;
+    --muted-foreground: #a0a0a0;
+    --accent: #1a3333;
+    --accent-foreground: #02a0a9;
+    --border: #2d3838;
+    --input: #2d3838;
+    --popover: #1a2222;
+    --popover-foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+@keyframes scoreFill {
+  from {
+    width: 0;
+  }
+}
+
+.score-bar {
+  animation: scoreFill 0.8s ease-out forwards;
+}
+
+.font-arabic {
+  font-family: "Cairo", "Segoe UI", sans-serif;
+}
+
+/* RTL layout utilities */
+[dir="rtl"] .sidebar {
+  right: 0;
+  left: auto;
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+[dir="rtl"] aside.hidden.md\:flex {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+[dir="rtl"] table th,
+[dir="rtl"] table td {
+  text-align: right;
+}
+
+[dir="rtl"] .flex.items-center.gap-2,
+[dir="rtl"] .flex.items-center.gap-3,
+[dir="rtl"] .flex.items-center.gap-4 {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] nav.fixed.bottom-0 {
+  flex-direction: row-reverse;
+}
