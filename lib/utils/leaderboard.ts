@@ -12,6 +12,7 @@ export async function getLeaderboard(
 
   const students = await prisma.student.findMany({
     include: {
+      schoolClass: true,
       progressLogs: {
         where,
         select: {
@@ -52,7 +53,7 @@ export async function getLeaderboard(
       id: student.id,
       name: student.name,
       studentCode: student.studentCode,
-      className: student.className,
+      className: student.schoolClass?.name ?? "—",
       avatarUrl: student.avatarUrl,
       avgScore: Math.round(avgScore * 10) / 10,
       totalLogs: logs.length,

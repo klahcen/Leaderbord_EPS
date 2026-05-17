@@ -23,6 +23,22 @@
     "noActivity": "Aucune activité enregistrée.",
     "generatingReport": "Génération du rapport..."
   },
+  "classes": {
+    "title": "Classes",
+    "addClass": "Ajouter une classe",
+    "name": "Nom de la classe",
+    "code": "Code classe",
+    "codeOptional": "Généré automatiquement si vide",
+    "noClasses": "Aucune classe pour le moment.",
+    "deleteConfirm": "Supprimer la classe ?",
+    "deleteConfirmMessage": "Cette classe sera supprimée définitivement.",
+    "deleteWithStudents": "Cette classe compte {count} élève(s). Choisissez une action :",
+    "deleteSetNull": "Supprimer la classe uniquement (les élèves sont conservés)",
+    "deleteCascade": "Supprimer la classe et tous ses élèves",
+    "codeExists": "Ce code de classe existe déjà.",
+    "saveError": "Impossible d'enregistrer la classe.",
+    "deleteError": "Impossible de supprimer la classe."
+  },
   "students": {
     "title": "Élèves",
     "description": "Gérer et consulter tous les élèves",
@@ -64,7 +80,19 @@
     "progressHistory": "Historique de progression",
     "noProgressYet": "Aucune progression enregistrée.",
     "date": "Date",
-    "edit": "Modifier"
+    "edit": "Modifier",
+    "editTitle": "Modifier l'élève",
+    "editDescription": "Mettre à jour les informations de l'élève",
+    "editStudent": "Modifier l'élève",
+    "noClass": "Sans classe",
+    "other": "Autre",
+    "avatarUrl": "URL de l'avatar (optionnel)",
+    "actions": "Actions",
+    "deleteConfirm": "Supprimer l'élève ?",
+    "deleteConfirmMessage": "L'élève et tous ses journaux de progression seront supprimés.",
+    "codeExists": "Ce code élève existe déjà.",
+    "updateError": "Échec de la mise à jour.",
+    "saving": "Enregistrement..."
   },
   "progress": {
     "title": "Saisir la progression",
@@ -137,7 +165,8 @@
     "loginButton": "Se connecter",
     "signingIn": "Connexion...",
     "loginError": "E-mail ou mot de passe invalide.",
-    "viewPublicLeaderboard": "Voir le classement public"
+    "viewPublicLeaderboard": "Voir le classement public",
+    "devCredentials": "Connexion dev : Aya@sefyani.lakrizi / LAHCEN@AYA2026 (voir prisma/seed.ts)"
   },
   "ai": {
     "coachReport": "Rapport du coach IA",

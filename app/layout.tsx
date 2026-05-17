@@ -6,7 +6,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 
 export const metadata: Metadata = {
-  title: "PE Dashboard — Physical Education Leaderboard",
+  title: "PE Sport Leaderboard — Physical Education",
   description: "Manage student progress and display class leaderboard",
 };
 

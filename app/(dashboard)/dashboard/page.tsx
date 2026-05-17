@@ -27,6 +27,7 @@ async function getDashboardData() {
       }),
       prisma.student.findMany({
         include: {
+          schoolClass: true,
           progressLogs: {
             select: { score: true, maxScore: true, recordedAt: true },
             orderBy: { recordedAt: "desc" },
@@ -49,7 +50,7 @@ async function getDashboardData() {
       id: s.id,
       name: s.name,
       studentCode: s.studentCode,
-      className: s.className,
+      className: s.schoolClass?.name ?? "—",
       avgScore: Math.round(avg * 10) / 10,
       lastActivity: logs[0]?.recordedAt ?? null,
     };

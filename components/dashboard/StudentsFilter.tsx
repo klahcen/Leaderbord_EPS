@@ -12,12 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import type { ClassOption } from "@/types";
 
 interface StudentsFilterProps {
-  classes: string[];
+  classes: ClassOption[];
   current: {
     search?: string;
-    className?: string;
+    classId?: string;
     gender?: string;
   };
 }
@@ -50,19 +51,17 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
         className="max-w-xs"
       />
       <Select
-        value={current.className ?? "all"}
-        onValueChange={(v) =>
-          applyFilters({ className: v === "all" ? "" : v })
-        }
+        value={current.classId ?? "all"}
+        onValueChange={(v) => applyFilters({ classId: v === "all" ? "" : v })}
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger className="w-48">
           <SelectValue placeholder={t("class")} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">{t("allClasses")}</SelectItem>
           {classes.map((c) => (
-            <SelectItem key={c} value={c}>
-              {c}
+            <SelectItem key={c.id} value={c.id}>
+              {c.name}
             </SelectItem>
           ))}
         </SelectContent>
@@ -78,6 +77,7 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
           <SelectItem value="all">{t("allGenders")}</SelectItem>
           <SelectItem value="MALE">{t("male")}</SelectItem>
           <SelectItem value="FEMALE">{t("female")}</SelectItem>
+          <SelectItem value="OTHER">{t("other")}</SelectItem>
         </SelectContent>
       </Select>
       <Button onClick={() => applyFilters({ search })}>{t("search")}</Button>

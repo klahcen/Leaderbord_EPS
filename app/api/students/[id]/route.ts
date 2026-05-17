@@ -12,6 +12,7 @@ export async function GET(
   const student = await prisma.student.findUnique({
     where: { id: params.id },
     include: {
+      schoolClass: true,
       progressLogs: { orderBy: { recordedAt: "desc" } },
     },
   });
@@ -28,11 +29,24 @@ export async function PUT(
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const student = await prisma.student.update({
-    where: { id: params.id },
-    data: body,
-  });
-  return NextResponse.json(student);
+  try {
+    const student = await prisma.student.update({
+      where: { id: params.id },
+      data: {
+        name: body.name?.trim(),
+        studentCode: body.studentCode?.trim(),
+        ...(body.classId
+          ? { schoolClass: { connect: { id: body.classId } } }
+          : { schoolClass: { disconnect: true } }),
+        age: body.age ?? null,
+        gender: body.gender ?? null,
+        avatarUrl: body.avatarUrl ?? null,
+      },
+    });
+    return NextResponse.json(student);
+  } catch {
+    return NextResponse.json({ error: "Update failed" }, { status: 400 });
+  }
 }
 
 export async function DELETE(

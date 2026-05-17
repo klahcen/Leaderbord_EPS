@@ -1,37 +1,39 @@
-import { PrismaClient, Category } from "@prisma/client";
+import { Category } from "@prisma/client";
 import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import {
+  createProgressLog,
+  upsertSchoolClasses,
+  upsertSeedStudent,
+} from "@/lib/seed-data";
 
 const categories = Object.values(Category);
 
 async function main() {
+  const professorEmail = "Aya@sefyani.lakrizi";
+  const professorPassword = "LAHCEN@AYA2026";
+  const hashedPassword = await bcrypt.hash(professorPassword, 10);
+
   const professor = await prisma.user.upsert({
-    where: { email: "Aya@sefyani.lakrizi" },
-    update: {},
+    where: { email: professorEmail },
+    update: {
+      name: "Prof. Aya SEFYANI LAKRIZI",
+      password: hashedPassword,
+      role: "PROFESSOR",
+    },
     create: {
       name: "Prof. Aya SEFYANI LAKRIZI",
-      email: "Aya@sefyani.lakrizi",
-      password: await bcrypt.hash("LAHCEN@AYA2026", 10),
+      email: professorEmail,
+      password: hashedPassword,
       role: "PROFESSOR",
     },
   });
 
-  const classes = ["Class A", "Class B", "Class C"];
+  const classRecords = await upsertSchoolClasses();
   const studentRecords = [];
 
   for (let i = 0; i < 10; i++) {
-    const student = await prisma.student.upsert({
-      where: { studentCode: `STU${String(i + 1).padStart(3, "0")}` },
-      update: {},
-      create: {
-        name: `Student ${i + 1}`,
-        studentCode: `STU${String(i + 1).padStart(3, "0")}`,
-        className: classes[i % 3],
-        age: 12 + (i % 5),
-        gender: i % 2 === 0 ? "MALE" : "FEMALE",
-      },
-    });
+    const student = await upsertSeedStudent(i, classRecords[i % 3].id);
     studentRecords.push(student);
   }
 
@@ -43,22 +45,22 @@ async function main() {
         const recordedAt = new Date();
         recordedAt.setDate(recordedAt.getDate() - daysAgo);
 
-        await prisma.progressLog.create({
-          data: {
-            studentId: student.id,
-            professorId: professor.id,
-            category,
-            score: 50 + Math.random() * 50,
-            maxScore: 100,
-            notes: j === 0 ? `Assessment for ${category.toLowerCase()}` : null,
-            recordedAt,
-          },
+        await createProgressLog({
+          studentId: student.id,
+          professorId: professor.id,
+          category,
+          score: 50 + Math.random() * 50,
+          notes: j === 0 ? `Assessment for ${category.toLowerCase()}` : null,
+          recordedAt,
         });
       }
     }
   }
 
-  console.log("Seed completed: 1 professor, 10 students, progress logs created");
+  console.log(
+    "Seed completed: 1 professor, 3 classes, 10 students, progress logs created"
+  );
+  console.log(`Professor login — email: ${professorEmail}  password: ${professorPassword}`);
 }
 
 main()

@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
   const student = await prisma.student.findUnique({
     where: { id: studentId },
     include: {
+      schoolClass: true,
       progressLogs: {
         orderBy: { recordedAt: "desc" },
         take: 50,
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
         role: "user",
         content: `You are an expert Physical Education coach and sports analyst. ${languageInstruction}
 
-Here is the progress data for student **${student.name}** (Class: ${student.className}, Code: ${student.studentCode}):
+Here is the progress data for student **${student.name}** (Class: ${student.schoolClass?.name ?? "No class"}, Code: ${student.studentCode}):
 
 \`\`\`
 ${logsSummary || "No progress logs recorded yet."}

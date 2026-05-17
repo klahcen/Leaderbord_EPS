@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { useTranslations, useFormatter } from "next-intl";
+import { Pencil, Trash2 } from "lucide-react";
+import { deleteStudent } from "@/lib/actions/student.actions";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+
 interface StudentRow {
   id: string;
   name: string;
@@ -11,9 +17,28 @@ interface StudentRow {
   lastActivity: Date | null;
 }
 
-export function StudentTable({ students }: { students: StudentRow[] }) {
+export function StudentTable({
+  students,
+  showActions = false,
+}: {
+  students: StudentRow[];
+  showActions?: boolean;
+}) {
+  const router = useRouter();
   const t = useTranslations("students");
+  const tCommon = useTranslations("common");
   const format = useFormatter();
+  const [isPending, startTransition] = useTransition();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  function confirmDelete() {
+    if (!deleteId) return;
+    startTransition(async () => {
+      await deleteStudent(deleteId);
+      setDeleteId(null);
+      router.refresh();
+    });
+  }
 
   if (students.length === 0) {
     return (
@@ -22,60 +47,98 @@ export function StudentTable({ students }: { students: StudentRow[] }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b bg-muted/50">
-            <th className="px-4 py-3 text-left font-medium">{t("name")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("code")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("class")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("avgScore")}</th>
-            <th className="px-4 py-3 text-left font-medium">{t("lastActivity")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => (
-            <tr
-              key={student.id}
-              className="border-b transition-colors hover:bg-muted/30"
-            >
-              <td className="px-4 py-3">
-                <Link
-                  href={`/dashboard/students/${student.id}`}
-                  className="font-medium text-primary hover:underline"
-                >
-                  {student.name}
-                </Link>
-              </td>
-              <td className="px-4 py-3 text-muted-foreground">
-                {student.studentCode}
-              </td>
-              <td className="px-4 py-3">{student.className}</td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="score-bar-track w-24">
-                    <span
-                      className={`score-bar-fill ${student.avgScore >= 80 ? "high" : student.avgScore >= 50 ? "medium" : "low"}`}
-                      style={{ width: `${Math.min(Math.max(student.avgScore, 0), 100)}%` }}
-                    />
-                  </div>
-                  <span>
-                    {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
-                  </span>
-                </div>
-              </td>
-              <td className="px-4 py-3 text-muted-foreground">
-                {student.lastActivity
-                  ? format.dateTime(new Date(student.lastActivity), {
-                      dateStyle: "medium",
-                    })
-                  : "—"}
-              </td>
+    <>
+      <div className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-muted/50">
+              <th className="px-4 py-3 text-left font-medium">{t("name")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("code")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("class")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("avgScore")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("lastActivity")}</th>
+              {showActions && (
+                <th className="px-4 py-3 text-right font-medium">{t("actions")}</th>
+              )}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {students.map((student) => (
+              <tr
+                key={student.id}
+                className="border-b transition-colors hover:bg-muted/30"
+              >
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/dashboard/students/${student.id}`}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    {student.name}
+                  </Link>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {student.studentCode}
+                </td>
+                <td className="px-4 py-3">{student.className}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="score-bar-track w-24">
+                      <span
+                        className={`score-bar-fill ${student.avgScore >= 80 ? "high" : student.avgScore >= 50 ? "medium" : "low"}`}
+                        style={{
+                          width: `${Math.min(Math.max(student.avgScore, 0), 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <span>
+                      {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  {student.lastActivity
+                    ? format.dateTime(new Date(student.lastActivity), {
+                        dateStyle: "medium",
+                      })
+                    : "—"}
+                </td>
+                {showActions && (
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-1">
+                      <Link
+                        href={`/dashboard/students/${student.id}/edit`}
+                        className="btn btn-ghost p-2"
+                        aria-label={tCommon("edit")}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-ghost p-2 text-destructive"
+                        onClick={() => setDeleteId(student.id)}
+                        aria-label={tCommon("delete")}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <ConfirmModal
+        open={!!deleteId}
+        title={t("deleteConfirm")}
+        message={t("deleteConfirmMessage")}
+        confirmLabel={tCommon("delete")}
+        loading={isPending}
+        onCancel={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
+    </>
   );
 }
 

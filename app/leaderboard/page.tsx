@@ -10,6 +10,7 @@ import { LeaderboardCardList } from "@/components/leaderboard/LeaderboardCard";
 import { AISpotlightCard } from "@/components/leaderboard/AISpotlightCard";
 import { LeaderboardHero } from "@/components/leaderboard/LeaderboardHero";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/providers/ThemeProvider";
 
@@ -44,9 +45,12 @@ export default async function LeaderboardPage({
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/leaderboard" className="sidebar-logo !p-0 text-base md:text-lg">
-            PE <span>Sport</span>
-          </Link>
+          <Logo
+            href="/leaderboard"
+            size="lg"
+            showText
+            variant="onLight"
+          />
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />

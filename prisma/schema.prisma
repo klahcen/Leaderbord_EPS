@@ -15,6 +15,7 @@ enum Role {
 enum Gender {
   MALE
   FEMALE
+  OTHER
 }
 
 enum Category {
@@ -39,11 +40,23 @@ model User {
   progressLogs ProgressLog[]
 }
 
+model SchoolClass {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  code      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  students  Student[]
+
+  @@map("Class")
+}
+
 model Student {
   id           String        @id @default(cuid())
   name         String
   studentCode  String        @unique
-  className    String
+  classId      String?
+  schoolClass  SchoolClass?  @relation(fields: [classId], references: [id], onDelete: SetNull)
   age          Int?
   gender       Gender?
   avatarUrl    String?

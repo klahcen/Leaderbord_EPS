@@ -5,12 +5,13 @@ import { Header } from "@/components/dashboard/Header";
 import { StudentTable } from "@/components/dashboard/StudentTable";
 import { Suspense } from "react";
 import { StudentsFilter } from "@/components/dashboard/StudentsFilter";
+import ClassList from "@/components/ClassList";
 import { Button } from "@/components/ui/button";
 
 interface PageProps {
   searchParams: {
     search?: string;
-    className?: string;
+    classId?: string;
     gender?: string;
     page?: string;
   };
@@ -22,7 +23,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
   const t = await getTranslations("students");
   const page = Math.max(1, parseInt(searchParams.page ?? "1", 10));
   const search = searchParams.search ?? "";
-  const className = searchParams.className;
+  const classId = searchParams.classId;
   const gender = searchParams.gender;
 
   const where = {
@@ -35,8 +36,8 @@ export default async function StudentsPage({ searchParams }: PageProps) {
             ],
           }
         : {},
-      className ? { className } : {},
-      gender ? { gender: gender as "MALE" | "FEMALE" } : {},
+      classId ? { classId } : {},
+      gender ? { gender: gender as "MALE" | "FEMALE" | "OTHER" } : {},
     ],
   };
 
@@ -44,6 +45,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
     prisma.student.findMany({
       where,
       include: {
+        schoolClass: true,
         progressLogs: {
           select: { score: true, maxScore: true, recordedAt: true },
           orderBy: { recordedAt: "desc" },
@@ -54,10 +56,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
       take: PAGE_SIZE,
     }),
     prisma.student.count({ where }),
-    prisma.student.findMany({
-      select: { className: true },
-      distinct: ["className"],
-    }),
+    prisma.schoolClass.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   const rows = students.map((s) => {
@@ -70,7 +69,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
       id: s.id,
       name: s.name,
       studentCode: s.studentCode,
-      className: s.className,
+      className: s.schoolClass?.name ?? "—",
       avgScore: Math.round(avg * 10) / 10,
       lastActivity: logs[0]?.recordedAt ?? null,
     };
@@ -86,15 +85,17 @@ export default async function StudentsPage({ searchParams }: PageProps) {
         </Button>
       </Header>
 
+      <ClassList classes={classes} />
+
       <Suspense fallback={<div className="h-10" />}>
         <StudentsFilter
-          classes={classes.map((c) => c.className)}
-          current={{ search, className, gender }}
+          classes={classes}
+          current={{ search, classId, gender }}
         />
       </Suspense>
 
       <div className="mt-6">
-        <StudentTable students={rows} />
+        <StudentTable students={rows} showActions />
       </div>
 
       {totalPages > 1 && (
@@ -102,7 +103,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
           {page > 1 && (
             <Button variant="outline" size="sm" asChild>
               <Link
-                href={`/dashboard/students?page=${page - 1}&search=${search}&className=${className ?? ""}&gender=${gender ?? ""}`}
+                href={`/dashboard/students?page=${page - 1}&search=${search}&classId=${classId ?? ""}&gender=${gender ?? ""}`}
               >
                 {t("previous")}
               </Link>
@@ -114,7 +115,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
           {page < totalPages && (
             <Button variant="outline" size="sm" asChild>
               <Link
-                href={`/dashboard/students?page=${page + 1}&search=${search}&className=${className ?? ""}&gender=${gender ?? ""}`}
+                href={`/dashboard/students?page=${page + 1}&search=${search}&classId=${classId ?? ""}&gender=${gender ?? ""}`}
               >
                 {t("next")}
               </Link>

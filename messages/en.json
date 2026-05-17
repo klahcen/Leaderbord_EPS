@@ -23,6 +23,22 @@
     "noActivity": "No activity recorded yet.",
     "generatingReport": "Generating report..."
   },
+  "classes": {
+    "title": "Classes",
+    "addClass": "Add Class",
+    "name": "Class name",
+    "code": "Class code",
+    "codeOptional": "Auto-generated if empty",
+    "noClasses": "No classes yet.",
+    "deleteConfirm": "Delete class?",
+    "deleteConfirmMessage": "This class will be removed permanently.",
+    "deleteWithStudents": "This class has {count} student(s). Choose what to do:",
+    "deleteSetNull": "Remove class only (students keep their records)",
+    "deleteCascade": "Delete class and all its students",
+    "codeExists": "This class code is already in use.",
+    "saveError": "Could not save class.",
+    "deleteError": "Could not delete class."
+  },
   "students": {
     "title": "Students",
     "description": "Manage and view all students",
@@ -64,7 +80,19 @@
     "progressHistory": "Progress History",
     "noProgressYet": "No progress logged yet.",
     "date": "Date",
-    "edit": "Edit"
+    "edit": "Edit",
+    "editTitle": "Edit Student",
+    "editDescription": "Update student details",
+    "editStudent": "Edit Student",
+    "noClass": "No class",
+    "other": "Other",
+    "avatarUrl": "Avatar URL (optional)",
+    "actions": "Actions",
+    "deleteConfirm": "Delete student?",
+    "deleteConfirmMessage": "This will permanently delete the student and all progress logs.",
+    "codeExists": "This student code is already in use.",
+    "updateError": "Failed to update student.",
+    "saving": "Saving..."
   },
   "progress": {
     "title": "Log Progress",
@@ -137,7 +165,8 @@
     "loginButton": "Sign In",
     "signingIn": "Signing in...",
     "loginError": "Invalid email or password.",
-    "viewPublicLeaderboard": "View public leaderboard"
+    "viewPublicLeaderboard": "View public leaderboard",
+    "devCredentials": "Dev login: Aya@sefyani.lakrizi / LAHCEN@AYA2026 (from prisma/seed.ts)"
   },
   "ai": {
     "coachReport": "AI Coach Report",

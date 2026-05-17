@@ -21,6 +21,7 @@ export async function POST(req: Request) {
 
   const students = await prisma.student.findMany({
     include: {
+      schoolClass: true,
       progressLogs: {
         orderBy: { recordedAt: "desc" },
         take: 10,
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
             ) / s.progressLogs.length
           ).toFixed(1)
         : "no data";
-      return `- ${s.name} (${s.className}): avg score ${avg}%, ${s.progressLogs.length} recent logs`;
+      return `- ${s.name} (${s.schoolClass?.name ?? "No class"}): avg score ${avg}%, ${s.progressLogs.length} recent logs`;
     })
     .join("\n");
 

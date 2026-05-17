@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
+import { Logo } from "@/components/Logo";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -31,9 +32,14 @@ export function Sidebar() {
   return (
     <>
       <aside className="sidebar hidden md:flex">
-        <Link href="/dashboard" className="sidebar-logo">
-          PE <span>Sport</span>
-        </Link>
+        <Logo
+          href="/dashboard"
+          size="md"
+          showText
+          variant="onDark"
+          className="sidebar-brand"
+          priority
+        />
         <nav className="flex flex-1 flex-col gap-1">
           {navItems.map(({ href, label, icon: Icon }) => (
             <Link

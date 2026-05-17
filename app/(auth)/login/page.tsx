@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Logo } from "@/components/Logo";
 
 function LoginForm() {
   const router = useRouter();
@@ -51,6 +52,13 @@ function LoginForm() {
   return (
     <div className="login-page">
       <div className="login-left">
+        <Logo
+          size="xl"
+          showText
+          variant="onDark"
+          className="login-brand mb-8"
+          priority
+        />
         <h1 className="login-left-headline">
           {t("loginHeadlineLine1")}
           <br />
@@ -64,6 +72,13 @@ function LoginForm() {
 
       <div className="login-right">
         <div className="login-form-card">
+          <Logo
+            size="xl"
+            showText
+            variant="onLight"
+            className="login-brand-mobile mx-auto mb-6 md:hidden"
+            priority
+          />
           <div className="mb-6 flex justify-end">
             <LanguageSwitcher />
           </div>
@@ -90,7 +105,8 @@ function LoginForm() {
                 className="input-lemonade"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="prof@pe.school"
+                placeholder="Aya@sefyani.lakrizi"
+                autoComplete="username"
                 required
               />
             </div>
@@ -107,9 +123,15 @@ function LoginForm() {
                 className="input-lemonade"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 required
               />
             </div>
+            {/* {process.env.NODE_ENV === "development" && (
+              <p className="rounded-lg border border-dashed border-primary/30 bg-primary/5 px-3 py-2 text-xs text-muted-foreground">
+                {t("devCredentials")}
+              </p>
+            )} */}
             {error && (
               <p className="text-sm font-medium text-destructive">{error}</p>
             )}

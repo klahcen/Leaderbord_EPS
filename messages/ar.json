@@ -23,6 +23,22 @@
     "noActivity": "لم يُسجَّل أي نشاط بعد.",
     "generatingReport": "جارٍ إنشاء التقرير..."
   },
+  "classes": {
+    "title": "الصفوف",
+    "addClass": "إضافة صف",
+    "name": "اسم الصف",
+    "code": "رمز الصف",
+    "codeOptional": "يُولَّد تلقائياً إذا تُرك فارغاً",
+    "noClasses": "لا توجد صفوف بعد.",
+    "deleteConfirm": "حذف الصف؟",
+    "deleteConfirmMessage": "سيُحذف هذا الصف نهائياً.",
+    "deleteWithStudents": "يحتوي هذا الصف على {count} طالب/طلاب. اختر الإجراء:",
+    "deleteSetNull": "حذف الصف فقط (الطلاب يبقون في السجل)",
+    "deleteCascade": "حذف الصف وجميع طلابه",
+    "codeExists": "رمز الصف مستخدم مسبقاً.",
+    "saveError": "تعذّر حفظ الصف.",
+    "deleteError": "تعذّر حذف الصف."
+  },
   "students": {
     "title": "الطلاب",
     "description": "إدارة وعرض جميع الطلاب",
@@ -64,7 +80,19 @@
     "progressHistory": "سجل التقدم",
     "noProgressYet": "لم يُسجَّل أي تقدم بعد.",
     "date": "التاريخ",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "editTitle": "تعديل الطالب",
+    "editDescription": "تحديث بيانات الطالب",
+    "editStudent": "تعديل الطالب",
+    "noClass": "بدون صف",
+    "other": "آخر",
+    "avatarUrl": "رابط الصورة (اختياري)",
+    "actions": "إجراءات",
+    "deleteConfirm": "حذف الطالب؟",
+    "deleteConfirmMessage": "سيُحذف الطالب وجميع سجلات تقدمه نهائياً.",
+    "codeExists": "رمز الطالب مستخدم مسبقاً.",
+    "updateError": "فشل التحديث.",
+    "saving": "جارٍ الحفظ..."
   },
   "progress": {
     "title": "تسجيل التقدم",
@@ -137,7 +165,8 @@
     "loginButton": "دخول",
     "signingIn": "جارٍ الدخول...",
     "loginError": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
-    "viewPublicLeaderboard": "عرض لوحة الترتيب العامة"
+    "viewPublicLeaderboard": "عرض لوحة الترتيب العامة",
+    "devCredentials": "دخول التطوير: Aya@sefyani.lakrizi / LAHCEN@AYA2026 (من prisma/seed.ts)"
   },
   "ai": {
     "coachReport": "تقرير المدرب الذكي",

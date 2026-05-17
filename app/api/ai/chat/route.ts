@@ -31,10 +31,11 @@ export async function POST(req: NextRequest) {
     prisma.progressLog.findMany({
       take: 20,
       orderBy: { recordedAt: "desc" },
-      include: { student: { select: { name: true, className: true } } },
+      include: { student: { select: { name: true, schoolClass: { select: { name: true } } } } },
     }),
     prisma.student.findMany({
       include: {
+        schoolClass: true,
         progressLogs: { take: 5, orderBy: { recordedAt: "desc" } },
       },
     }),
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
   const recentActivity = recentLogs
     .map(
       (l) =>
-        `${l.student.name} (${l.student.className}): ${l.category} ${l.score}/${l.maxScore}`
+        `${l.student.name} (${l.student.schoolClass?.name ?? "No class"}): ${l.category} ${l.score}/${l.maxScore}`
     )
     .join("; ");
 
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
               ) / s.progressLogs.length
             ).toFixed(0)
           : "N/A";
-      return `${s.name} (${s.className}): ${avg}% avg`;
+      return `${s.name} (${s.schoolClass?.name ?? "No class"}): ${avg}% avg`;
     })
     .join("\n");
 

@@ -26,6 +26,7 @@ export default async function StudentDetailPage({
   const student = await prisma.student.findUnique({
     where: { id: params.id },
     include: {
+      schoolClass: true,
       progressLogs: {
         orderBy: { recordedAt: "desc" },
         ...(searchParams.category && searchParams.category !== "ALL"
@@ -53,20 +54,27 @@ export default async function StudentDetailPage({
     <div>
       <Header
         title={student.name}
-        description={`${student.className} · ${student.studentCode}`}
+        description={`${student.schoolClass?.name ?? "—"} · ${student.studentCode}`}
       >
-        <Button asChild>
-          <Link href={`/dashboard/progress?studentId=${student.id}`}>
-            {t("addProgress")}
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href={`/dashboard/students/${student.id}/edit`}>
+              {t("editStudent")}
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/dashboard/progress?studentId=${student.id}`}>
+              {t("addProgress")}
+            </Link>
+          </Button>
+        </div>
       </Header>
 
       <Card className="mb-6">
         <CardContent className="flex flex-wrap gap-6 pt-6">
           <div>
             <p className="text-sm text-muted-foreground">{t("class")}</p>
-            <p className="font-medium">{student.className}</p>
+            <p className="font-medium">{student.schoolClass?.name ?? "—"}</p>
           </div>
           {student.age && (
             <div>
