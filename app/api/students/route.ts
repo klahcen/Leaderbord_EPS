@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     },
     include: {
       schoolClass: true,
-      progressLogs: { select: { score: true, maxScore: true, recordedAt: true } },
+      progressLogs: { select: { score: true, iacMax: true, recordedAt: true } },
     },
     orderBy: { name: "asc" },
   });

@@ -25,16 +25,22 @@ export default async function EditProgressPage({
   return (
     <div>
       <Header title={t("editTitle")} description={t("editDescription")} />
-      <Card className="max-w-2xl">
+      <Card className="max-w-3xl">
         <CardContent className="pt-6">
           <ProgressForm
             students={students}
             initialData={{
               id: log.id,
               studentId: log.studentId,
-              category: log.category,
+              knowledgeDomain: log.knowledgeDomain,
+              family: log.family,
+              subActivity: log.subActivity,
+              criteria: log.criteria,
+              definition: log.definition,
+              tool: log.tool,
+              iacMax: log.iacMax,
               score: log.score,
-              maxScore: log.maxScore,
+              semester: log.semester,
               notes: log.notes ?? undefined,
               recordedAt: log.recordedAt,
             }}

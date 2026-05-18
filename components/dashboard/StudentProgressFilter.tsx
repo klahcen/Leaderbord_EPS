@@ -3,18 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-
-const categories = [
-  "ALL",
-  "RUNNING",
-  "JUMPING",
-  "SWIMMING",
-  "STRENGTH",
-  "FLEXIBILITY",
-  "ENDURANCE",
-  "COORDINATION",
-  "TEAMWORK",
-] as const;
+import { LEADERBOARD_CATEGORIES } from "@/lib/constants/leaderboard-categories";
 
 export function StudentProgressFilter({
   studentId,
@@ -27,7 +16,7 @@ export function StudentProgressFilter({
 
   return (
     <div className="flex flex-wrap gap-2">
-      {categories.map((cat) => (
+      {LEADERBOARD_CATEGORIES.map((cat) => (
         <Link
           key={cat}
           href={

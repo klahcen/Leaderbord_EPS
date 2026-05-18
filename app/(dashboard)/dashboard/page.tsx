@@ -3,6 +3,11 @@ import { getTranslations, getFormatter } from "next-intl/server";
 import { startOfWeek } from "date-fns";
 import { Users, ClipboardList, TrendingUp, Award } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import {
+  getClassAverageScore,
+  getTopStudent,
+  getTopStudentScores,
+} from "@/lib/utils/student-stats";
 import { Header } from "@/components/dashboard/Header";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { StudentTable, RecentActivityFeed } from "@/components/dashboard/StudentTable";
@@ -14,60 +19,39 @@ import { Button } from "@/components/ui/button";
 async function getDashboardData() {
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
 
-  const [totalStudents, logsThisWeek, recentLogs, studentsWithLogs, categoryAvgs] =
-    await Promise.all([
-      prisma.student.count(),
-      prisma.progressLog.count({
-        where: { recordedAt: { gte: weekStart } },
-      }),
-      prisma.progressLog.findMany({
-        take: 10,
-        orderBy: { recordedAt: "desc" },
-        include: { student: { select: { name: true } } },
-      }),
-      prisma.student.findMany({
-        include: {
-          schoolClass: true,
-          progressLogs: {
-            select: { score: true, maxScore: true, recordedAt: true },
-            orderBy: { recordedAt: "desc" },
-          },
-        },
-      }),
-      prisma.progressLog.groupBy({
-        by: ["category"],
-        _avg: { score: true },
-      }),
-    ]);
+  const [
+    totalStudents,
+    logsThisWeek,
+    recentLogs,
+    classAvg,
+    topStudent,
+    top5,
+    domainAvgs,
+  ] = await Promise.all([
+    prisma.student.count(),
+    prisma.progressLog.count({
+      where: { recordedAt: { gte: weekStart } },
+    }),
+    prisma.progressLog.findMany({
+      take: 10,
+      orderBy: { recordedAt: "desc" },
+      include: { student: { select: { name: true } } },
+    }),
+    getClassAverageScore(),
+    getTopStudent(),
+    getTopStudentScores(5),
+    prisma.progressLog.groupBy({
+      by: ["knowledgeDomain"],
+      _sum: { score: true, iacMax: true },
+    }),
+  ]);
 
-  const studentScores = studentsWithLogs.map((s) => {
-    const logs = s.progressLogs;
-    const avg =
-      logs.length > 0
-        ? logs.reduce((sum, l) => sum + (l.score / l.maxScore) * 100, 0) / logs.length
-        : 0;
-    return {
-      id: s.id,
-      name: s.name,
-      studentCode: s.studentCode,
-      className: s.schoolClass?.name ?? "—",
-      avgScore: Math.round(avg * 10) / 10,
-      lastActivity: logs[0]?.recordedAt ?? null,
-    };
-  });
-
-  const classAvg =
-    studentScores.length > 0
-      ? Math.round(
-          (studentScores.reduce((s, st) => s + st.avgScore, 0) / studentScores.length) * 10
-        ) / 10
-      : 0;
-
-  const topStudent = [...studentScores].sort((a, b) => b.avgScore - a.avgScore)[0];
-
-  const categoryChartData = categoryAvgs.map((c) => ({
-    category: c.category,
-    avgScore: Math.round((c._avg.score ?? 0) * 10) / 10,
+  const categoryChartData = domainAvgs.map((d) => ({
+    category: d.knowledgeDomain,
+    avgScore:
+      d._sum.iacMax && d._sum.iacMax > 0
+        ? Math.round(((d._sum.score ?? 0) / d._sum.iacMax) * 20 * 10) / 10
+        : 0,
   }));
 
   return {
@@ -78,12 +62,13 @@ async function getDashboardData() {
     recentLogs: recentLogs.map((l) => ({
       id: l.id,
       studentName: l.student.name,
-      category: l.category,
+      criteria: l.criteria,
+      knowledgeDomain: l.knowledgeDomain,
       score: l.score,
-      maxScore: l.maxScore,
+      iacMax: l.iacMax,
       recordedAt: l.recordedAt,
     })),
-    top5: [...studentScores].sort((a, b) => b.avgScore - a.avgScore).slice(0, 5),
+    top5,
     categoryChartData,
   };
 }
@@ -112,7 +97,7 @@ export default async function DashboardPage() {
         />
         <StatsCard
           title={t("avgScore")}
-          value={`${format.number(data.classAvg, { maximumFractionDigits: 1 })}%`}
+          value={`${format.number(data.classAvg, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/20`}
           icon={TrendingUp}
           highlight
         />
@@ -123,7 +108,8 @@ export default async function DashboardPage() {
             data.topStudent
               ? t("topStudentDesc", {
                   score: format.number(data.topStudent.avgScore, {
-                    maximumFractionDigits: 1,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                   }),
                 })
               : undefined

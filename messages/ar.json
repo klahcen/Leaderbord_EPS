@@ -117,7 +117,87 @@
     "scoreError": "يجب أن تكون الدرجة بين 0 والدرجة القصوى",
     "saveError": "فشل حفظ سجل التقدم",
     "normalized": "{percent}% معياري",
-    "invalidScore": "درجة غير صالحة"
+    "invalidScore": "درجة غير صالحة",
+    "selectFamily": "اختيار عائلة النشاط",
+    "selectGroup": "اختيار المجموعة",
+    "selectSubActivity": "اختيار النشاط الفرعي",
+    "iacMaxBadge": "الحد الأقصى: {max} نقطة",
+    "toolBadge": "أداة"
+  },
+  "activities": {
+    "ATHLETISME": "ألعاب القوى",
+    "SPORTS_COLLECTIFS": "الرياضات الجماعية",
+    "GYMNASTIQUE": "الجمباز",
+    "COURSES": "الجري",
+    "SAUTS": "الوثب",
+    "LANCERS": "الرمي",
+    "MARQUAGE_DEMARQUAGE": "المراوغة والتمويه",
+    "SPORTS_RENVOI": "رياضات الرد",
+    "SOL": "الجمباز الأرضي",
+    "COURSE_VITESSE": "العدو السريع",
+    "COURSE_HAIES": "العدو بالحواجز",
+    "COURSE_RELAIS": "العدو بالتناوب",
+    "COURSE_ENDURANCE": "العدو لمسافات طويلة",
+    "SAUT_LONGUEUR": "الوثب الطويل",
+    "SAUT_HAUTEUR": "الوثب العالي",
+    "TRIPLE_SAUT": "الوثب الثلاثي",
+    "LANCER_POIDS": "دفع الجلة",
+    "LANCER_DISQUE": "رمي القرص",
+    "LANCER_JAVELOT": "رمي الرمح",
+    "FOOTBALL": "كرة القدم",
+    "BASKETBALL": "كرة السلة",
+    "HANDBALL": "كرة اليد",
+    "RUGBY": "الركبي",
+    "VOLLEYBALL": "الكرة الطائرة",
+    "BADMINTON": "الريشة الطائرة",
+    "GYMNASTIQUE_SOL": "الجمباز الأرضي"
+  },
+  "evaluation": {
+    "domain": "مجال المعرفة",
+    "activity": "النشاط البدني",
+    "criteria": "معايير التقييم",
+    "definition": "التعريف",
+    "tool": "أدوات التقييم",
+    "iac": "المعامل (الحد الأقصى)",
+    "score": "درجة الطالب",
+    "semester": "الفصل الدراسي",
+    "sem1": "الفصل الأول",
+    "sem2": "الفصل الثاني",
+    "scoreOutOf": "الدرجة: {score} / {max}",
+    "finalMark": "الدرجة النهائية / 20",
+    "domains": {
+      "PROCEDURALE": "المعرفة الإجرائية",
+      "CONCEPTUELLE": "المعرفة المفاهيمية",
+      "COMPORTEMENTALE": "المعرفة السلوكية"
+    },
+    "activities": {
+      "ATHLETISME": "ألعاب القوى",
+      "SPORTS_COLLECTIFS": "الرياضات الجماعية",
+      "GYMNASTIQUE": "الجمباز",
+      "TOUTES_ACTIVITES": "جميع الأنشطة الداعمة"
+    },
+    "criteriaLabels": {
+      "HABILETE_MOTRICE": "المهارة الحركية",
+      "COMPORTEMENT_MOTEUR": "السلوك الحركي",
+      "CAPACITE_INDIVIDUELLE": "القدرة الرياضية الفردية",
+      "CAPACITE_COLLECTIVE": "القدرة الرياضية الجماعية",
+      "CAPACITE_GYMNASTIQUE": "القدرة الرياضية والمهارة الحركية",
+      "CONNAISSANCE_CONCEPTUELLE": "المفاهيم والقواعد والمعرفة العلمية",
+      "CONNAISSANCE_COMPORTEMENTALE": "المشاركة والسلوك والاستقلالية والتحكيم"
+    },
+    "definitions": {
+      "PRODUIT": "المنتج",
+      "PERFORMANCE": "الأداء",
+      "PRODUIT_COMPORTEMENT_PHYSIQUE": "منتج السلوك البدني",
+      "CONNAISSANCES_CONCEPTUELLES": "المعرفة المفاهيمية ومصطلحات النشاط البدني",
+      "ABSENCE_TENU_ARBITRAGE": "الغياب والزي والتحكيم والتنظيم والاحترام"
+    },
+    "tools": {
+      "CHRONOMETRE_DECAMETRE": "ساعة توقيت / ديكامتر",
+      "GRILLE_OBSERVATION": "شبكة الملاحظة",
+      "QUESTIONS_REPONSES": "أسئلة وأجوبة شفهية وكتابية",
+      "OBSERVATION_DIRECTE": "ملاحظة مباشرة للتلميذ طوال الدورة"
+    }
   },
   "leaderboard": {
     "title": "لوحة ترتيب الصف",
@@ -128,7 +208,8 @@
     "rank": "الترتيب",
     "student": "الطالب",
     "class": "الصف",
-    "score": "الدرجة",
+    "score": "الدرجة / 20",
+    "scoreValue": "{score}/20",
     "trend": "الاتجاه",
     "allCategories": "الكل",
     "aiSpotlight": "ضوء المدرب الذكي",
@@ -138,18 +219,18 @@
     "generatingSpotlight": "جارٍ إنشاء الضوء...",
     "trendUp": "صعود",
     "trendDown": "هبوط",
-    "trendStable": "مستقر"
+    "trendStable": "مستقر",
+    "familyShort": {
+      "ATHLETISME": "قوى",
+      "SPORTS_COLLECTIFS": "جم.",
+      "GYMNASTIQUE": "جمباز"
+    }
   },
   "categories": {
     "ALL": "الكل",
-    "RUNNING": "الجري",
-    "JUMPING": "القفز",
-    "SWIMMING": "السباحة",
-    "STRENGTH": "القوة",
-    "FLEXIBILITY": "المرونة",
-    "ENDURANCE": "التحمل",
-    "COORDINATION": "التنسيق",
-    "TEAMWORK": "العمل الجماعي"
+    "PROCEDURALE": "إجرائية",
+    "CONCEPTUELLE": "مفاهيمية",
+    "COMPORTEMENTALE": "سلوكية"
   },
   "auth": {
     "login": "تسجيل الدخول",

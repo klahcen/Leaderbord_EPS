@@ -14,7 +14,7 @@
     "weeklyLogs": "Entrées cette semaine",
     "avgScore": "Score moyen de la classe",
     "topStudent": "Meilleur élève",
-    "topStudentDesc": "{score}% en moyenne",
+    "topStudentDesc": "{score}/20 en moyenne",
     "recentActivity": "Activité récente",
     "scoreByCategory": "Score par catégorie",
     "top5": "Top 5 des élèves",
@@ -117,7 +117,87 @@
     "scoreError": "Le score doit être entre 0 et le score maximum",
     "saveError": "Échec de l'enregistrement de la progression",
     "normalized": "{percent}% normalisé",
-    "invalidScore": "Score invalide"
+    "invalidScore": "Score invalide",
+    "selectFamily": "Choisir la famille d'activité",
+    "selectGroup": "Choisir le groupe",
+    "selectSubActivity": "Choisir la sous-activité",
+    "iacMaxBadge": "Max : {max} pts",
+    "toolBadge": "Outil"
+  },
+  "activities": {
+    "ATHLETISME": "Athlétisme",
+    "SPORTS_COLLECTIFS": "Sports Collectifs",
+    "GYMNASTIQUE": "Gymnastique",
+    "COURSES": "Courses",
+    "SAUTS": "Sauts",
+    "LANCERS": "Lancers",
+    "MARQUAGE_DEMARQUAGE": "Marquage - Démarquage",
+    "SPORTS_RENVOI": "Sports de Renvoi",
+    "SOL": "Gymnastique au sol",
+    "COURSE_VITESSE": "Course de vitesse / Sprint",
+    "COURSE_HAIES": "Course de haies",
+    "COURSE_RELAIS": "Course de relais",
+    "COURSE_ENDURANCE": "Course d'endurance / Cross",
+    "SAUT_LONGUEUR": "Saut en longueur",
+    "SAUT_HAUTEUR": "Saut en hauteur",
+    "TRIPLE_SAUT": "Triple saut",
+    "LANCER_POIDS": "Lancer de poids",
+    "LANCER_DISQUE": "Lancer de disque",
+    "LANCER_JAVELOT": "Lancer de javelot",
+    "FOOTBALL": "Football",
+    "BASKETBALL": "Basketball",
+    "HANDBALL": "Handball",
+    "RUGBY": "Rugby",
+    "VOLLEYBALL": "Volleyball",
+    "BADMINTON": "Badminton",
+    "GYMNASTIQUE_SOL": "Gymnastique au sol"
+  },
+  "evaluation": {
+    "domain": "Domaine de connaissances",
+    "activity": "Activité physique",
+    "criteria": "Critères d'évaluation",
+    "definition": "Définition",
+    "tool": "Outils utilisés",
+    "iac": "IAC (Note max)",
+    "score": "Note de l'élève",
+    "semester": "Semestre",
+    "sem1": "Semestre 1",
+    "sem2": "Semestre 2",
+    "scoreOutOf": "Note : {score} / {max}",
+    "finalMark": "Note finale / 20",
+    "domains": {
+      "PROCEDURALE": "Connaissances procédurales",
+      "CONCEPTUELLE": "Connaissances conceptuelles",
+      "COMPORTEMENTALE": "Connaissances comportementales"
+    },
+    "activities": {
+      "ATHLETISME": "Athlétisme",
+      "SPORTS_COLLECTIFS": "Sports collectifs",
+      "GYMNASTIQUE": "Gymnastique",
+      "TOUTES_ACTIVITES": "Toutes les activités support"
+    },
+    "criteriaLabels": {
+      "HABILETE_MOTRICE": "Habileté motrice",
+      "COMPORTEMENT_MOTEUR": "Comportement moteur",
+      "CAPACITE_INDIVIDUELLE": "Capacité sportive — individuelles",
+      "CAPACITE_COLLECTIVE": "Capacité sportive — collectives",
+      "CAPACITE_GYMNASTIQUE": "Capacité sportive et habileté motrice",
+      "CONNAISSANCE_CONCEPTUELLE": "Concepts, règlement, connaissances scientifiques",
+      "CONNAISSANCE_COMPORTEMENTALE": "Participation, comportement, autonomie, arbitrage"
+    },
+    "definitions": {
+      "PRODUIT": "produit",
+      "PERFORMANCE": "performance",
+      "PRODUIT_COMPORTEMENT_PHYSIQUE": "Produit du comportement physique",
+      "CONNAISSANCES_CONCEPTUELLES": "Connaissances conceptuelles et terminologie relatifs à l'APS",
+      "ABSENCE_TENU_ARBITRAGE": "Absence, tenu, arbitrage, organisation, respect"
+    },
+    "tools": {
+      "CHRONOMETRE_DECAMETRE": "Chronomètre / Décamètre",
+      "GRILLE_OBSERVATION": "Grille d'observation",
+      "QUESTIONS_REPONSES": "Questions et réponses orale et écrit",
+      "OBSERVATION_DIRECTE": "Observation directe de l'élève le long du cycle"
+    }
   },
   "leaderboard": {
     "title": "Classement de la classe",
@@ -128,7 +208,8 @@
     "rank": "Rang",
     "student": "Élève",
     "class": "Classe",
-    "score": "Score",
+    "score": "Note / 20",
+    "scoreValue": "{score}/20",
     "trend": "Tendance",
     "allCategories": "Tout",
     "aiSpotlight": "Coup de projecteur IA du coach",
@@ -138,18 +219,18 @@
     "generatingSpotlight": "Génération du spotlight...",
     "trendUp": "Hausse",
     "trendDown": "Baisse",
-    "trendStable": "Stable"
+    "trendStable": "Stable",
+    "familyShort": {
+      "ATHLETISME": "Athl.",
+      "SPORTS_COLLECTIFS": "S.Coll.",
+      "GYMNASTIQUE": "Gym."
+    }
   },
   "categories": {
     "ALL": "Tout",
-    "RUNNING": "Course",
-    "JUMPING": "Saut",
-    "SWIMMING": "Natation",
-    "STRENGTH": "Force",
-    "FLEXIBILITY": "Souplesse",
-    "ENDURANCE": "Endurance",
-    "COORDINATION": "Coordination",
-    "TEAMWORK": "Travail d'équipe"
+    "PROCEDURALE": "Procédurales",
+    "CONCEPTUELLE": "Conceptuelles",
+    "COMPORTEMENTALE": "Comportementales"
   },
   "auth": {
     "login": "Connexion",

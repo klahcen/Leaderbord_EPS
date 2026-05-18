@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { countStudents, getStudentScoreRows } from "@/lib/utils/student-stats";
 import { Header } from "@/components/dashboard/Header";
 import { StudentTable } from "@/components/dashboard/StudentTable";
 import { Suspense } from "react";
@@ -26,54 +27,17 @@ export default async function StudentsPage({ searchParams }: PageProps) {
   const classId = searchParams.classId;
   const gender = searchParams.gender;
 
-  const where = {
-    AND: [
-      search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" as const } },
-              { studentCode: { contains: search, mode: "insensitive" as const } },
-            ],
-          }
-        : {},
-      classId ? { classId } : {},
-      gender ? { gender: gender as "MALE" | "FEMALE" | "OTHER" } : {},
-    ],
-  };
+  const filters = { search, classId, gender };
 
-  const [students, total, classes] = await Promise.all([
-    prisma.student.findMany({
-      where,
-      include: {
-        schoolClass: true,
-        progressLogs: {
-          select: { score: true, maxScore: true, recordedAt: true },
-          orderBy: { recordedAt: "desc" },
-        },
-      },
-      orderBy: { name: "asc" },
+  const [rows, total, classes] = await Promise.all([
+    getStudentScoreRows({
+      ...filters,
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
-    prisma.student.count({ where }),
+    countStudents(filters),
     prisma.schoolClass.findMany({ orderBy: { name: "asc" } }),
   ]);
-
-  const rows = students.map((s) => {
-    const logs = s.progressLogs;
-    const avg =
-      logs.length > 0
-        ? logs.reduce((sum, l) => sum + (l.score / l.maxScore) * 100, 0) / logs.length
-        : 0;
-    return {
-      id: s.id,
-      name: s.name,
-      studentCode: s.studentCode,
-      className: s.schoolClass?.name ?? "—",
-      avgScore: Math.round(avg * 10) / 10,
-      lastActivity: logs[0]?.recordedAt ?? null,
-    };
-  });
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 

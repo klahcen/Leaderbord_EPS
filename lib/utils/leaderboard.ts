@@ -1,51 +1,114 @@
-import type { Category } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import type { LeaderboardEntry } from "@/types";
+import {
+  LEADERBOARD_CATEGORIES,
+  type LeaderboardCategory,
+} from "@/lib/constants/leaderboard-categories";
+import { calculateMarkOutOf20 } from "@/lib/utils/moroccan-scoring";
+import {
+  emptyFamilyScores,
+  type FamilyScoreBreakdown,
+  type LeaderboardEntry,
+} from "@/types";
+import type { ActivityFamily, KnowledgeDomain } from "@prisma/client";
 
-export async function getLeaderboard(
-  category?: string
-): Promise<LeaderboardEntry[]> {
-  const where =
-    category && category !== "ALL"
-      ? { category: category as Category }
-      : {};
+export type { LeaderboardCategory };
+export { LEADERBOARD_CATEGORIES };
 
-  const students = await prisma.student.findMany({
+const FAMILIES: ActivityFamily[] = [
+  "ATHLETISME",
+  "SPORTS_COLLECTIFS",
+  "GYMNASTIQUE",
+];
+
+function withFamilyScores(entry: LeaderboardEntry): LeaderboardEntry {
+  return {
+    ...entry,
+    familyScores: entry.familyScores ?? emptyFamilyScores(),
+  };
+}
+
+type StudentWithLogs = Awaited<ReturnType<typeof fetchStudentsWithLogs>>[number];
+
+async function fetchStudentsWithLogs() {
+  return prisma.student.findMany({
     include: {
       schoolClass: true,
       progressLogs: {
-        where,
         select: {
           score: true,
-          maxScore: true,
-          category: true,
+          iacMax: true,
+          knowledgeDomain: true,
+          family: true,
           recordedAt: true,
         },
         orderBy: { recordedAt: "desc" },
       },
     },
   });
+}
 
+function computeFamilyScores(
+  logs: StudentWithLogs["progressLogs"]
+): FamilyScoreBreakdown {
+  const result: FamilyScoreBreakdown = {
+    ATHLETISME: 0,
+    SPORTS_COLLECTIFS: 0,
+    GYMNASTIQUE: 0,
+  };
+
+  for (const family of FAMILIES) {
+    const familyLogs = logs.filter((l) => l.family === family);
+    if (familyLogs.length === 0) continue;
+    const totalScore = familyLogs.reduce((s, l) => s + l.score, 0);
+    const totalMax = familyLogs.reduce((s, l) => s + l.iacMax, 0);
+    result[family] = calculateMarkOutOf20(totalScore, totalMax);
+  }
+
+  return result;
+}
+
+function buildLeaderboard(
+  students: StudentWithLogs[],
+  filter: string
+): LeaderboardEntry[] {
   const entries: Omit<LeaderboardEntry, "rank">[] = [];
 
   for (const student of students) {
-    const logs = student.progressLogs;
+    const logs =
+      filter && filter !== "ALL"
+        ? student.progressLogs.filter(
+            (l) => l.knowledgeDomain === (filter as KnowledgeDomain)
+          )
+        : student.progressLogs;
+
     if (logs.length === 0) continue;
 
-    const avgScore =
-      logs.reduce((sum, l) => sum + (l.score / l.maxScore) * 100, 0) / logs.length;
+    const totalScore = logs.reduce((sum, l) => sum + l.score, 0);
+    const totalMax = logs.reduce((sum, l) => sum + l.iacMax, 0);
+    const markOutOf20 = calculateMarkOutOf20(totalScore, totalMax);
+    const familyScores = computeFamilyScores(logs);
 
     const recent = logs.slice(0, 3);
     const previous = logs.slice(3, 6);
-    const recentAvg = recent.reduce((s, l) => s + l.score, 0) / recent.length;
-    const prevAvg = previous.length
-      ? previous.reduce((s, l) => s + l.score, 0) / previous.length
-      : recentAvg;
+    const recentMark =
+      recent.length > 0
+        ? calculateMarkOutOf20(
+            recent.reduce((s, l) => s + l.score, 0),
+            recent.reduce((s, l) => s + l.iacMax, 0)
+          )
+        : 0;
+    const prevMark =
+      previous.length > 0
+        ? calculateMarkOutOf20(
+            previous.reduce((s, l) => s + l.score, 0),
+            previous.reduce((s, l) => s + l.iacMax, 0)
+          )
+        : recentMark;
 
     const trend: "up" | "down" | "stable" =
-      recentAvg > prevAvg + 2
+      recentMark > prevMark + 0.5
         ? "up"
-        : recentAvg < prevAvg - 2
+        : recentMark < prevMark - 0.5
           ? "down"
           : "stable";
 
@@ -55,7 +118,8 @@ export async function getLeaderboard(
       studentCode: student.studentCode,
       className: student.schoolClass?.name ?? "—",
       avatarUrl: student.avatarUrl,
-      avgScore: Math.round(avgScore * 10) / 10,
+      avgScore: markOutOf20,
+      familyScores,
       totalLogs: logs.length,
       trend,
       lastActivity: logs[0]?.recordedAt,
@@ -64,5 +128,27 @@ export async function getLeaderboard(
 
   return entries
     .sort((a, b) => b.avgScore - a.avgScore)
-    .map((entry, index) => ({ ...entry, rank: index + 1 }));
+    .map((entry, index) =>
+      withFamilyScores({ ...entry, rank: index + 1 })
+    );
+}
+
+export async function getLeaderboard(
+  filter?: string
+): Promise<LeaderboardEntry[]> {
+  const students = await fetchStudentsWithLogs();
+  return buildLeaderboard(students, filter ?? "ALL");
+}
+
+export async function getAllLeaderboards(): Promise<
+  Record<LeaderboardCategory, LeaderboardEntry[]>
+> {
+  const students = await fetchStudentsWithLogs();
+  const result = {} as Record<LeaderboardCategory, LeaderboardEntry[]>;
+
+  for (const category of LEADERBOARD_CATEGORIES) {
+    result[category] = buildLeaderboard(students, category);
+  }
+
+  return result;
 }

@@ -43,7 +43,12 @@ export function Podium({ top3 }: { top3: LeaderboardEntry[] }) {
             <p className="text-center text-sm font-bold">{student.name}</p>
             <p className="text-xs text-muted-foreground">{student.className}</p>
             <span className="badge-pink">
-              {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
+              {t("scoreValue", {
+                score: format.number(student.avgScore, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }),
+              })}
             </span>
             <span className={`podium-block ${slot.rankClass}`}>#{student.rank}</span>
           </article>

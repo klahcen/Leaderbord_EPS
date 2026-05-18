@@ -1,5 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -11,15 +13,24 @@ const LANGUAGES = [
 
 export function LanguageSwitcher({ className }: { className?: string }) {
   const locale = useLocale();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   function handleChange(newLocale: string) {
+    if (newLocale === locale) return;
     document.cookie = `locale=${newLocale}; path=/; max-age=31536000`;
-    window.location.reload();
+    startTransition(() => {
+      router.refresh();
+    });
   }
 
   return (
     <div
-      className={cn("flex items-center gap-1 rounded-lg border bg-card p-1", className)}
+      className={cn(
+        "flex items-center gap-1 rounded-lg border bg-card p-1 transition-opacity",
+        isPending && "pointer-events-none opacity-60",
+        className
+      )}
       role="group"
       aria-label="Language"
     >

@@ -14,11 +14,12 @@ import {
 } from "recharts";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
+import { calculateLogPercent } from "@/lib/utils/moroccan-scoring";
 
 interface ProgressLog {
-  category: string;
+  criteria: string;
   score: number;
-  maxScore: number;
+  iacMax: number;
   recordedAt: Date | string;
 }
 
@@ -34,16 +35,17 @@ const COLORS = [
 ];
 
 export function ProgressLineChart({ logs }: { logs: ProgressLog[] }) {
-  const tCat = useTranslations("categories");
-  const categories = Array.from(new Set(logs.map((l) => l.category)));
-  const label = (v: string) => tCat(v as "RUNNING");
+  const tEval = useTranslations("evaluation");
+  const criteriaKeys = Array.from(new Set(logs.map((l) => l.criteria)));
+  const label = (v: string) =>
+    tEval(`criteriaLabels.${v as "HABILETE_MOTRICE"}`);
 
   const chartData = logs
     .slice()
     .sort((a, b) => new Date(a.recordedAt).getTime() - new Date(b.recordedAt).getTime())
     .map((log) => ({
       date: format(new Date(log.recordedAt), "MMM d"),
-      [`${log.category}`]: Math.round((log.score / log.maxScore) * 100),
+      [`${log.criteria}`]: calculateLogPercent(log.score, log.iacMax),
     }));
 
   const merged = chartData.reduce<Record<string, unknown>[]>((acc, item) => {
@@ -64,7 +66,7 @@ export function ProgressLineChart({ logs }: { logs: ProgressLog[] }) {
         <YAxis domain={[0, 100]} className="text-xs" />
         <Tooltip />
         <Legend formatter={(v) => label(v as string)} />
-        {categories.map((cat, i) => (
+        {criteriaKeys.map((cat, i) => (
           <Line
             key={cat}
             type="monotone"
@@ -86,7 +88,7 @@ export function CategoryBarChart({
   data: { category: string; avgScore: number }[];
 }) {
   const tCat = useTranslations("categories");
-  const label = (v: string) => tCat(v as "RUNNING");
+  const label = (v: string) => tCat(v as "PROCEDURALE");
 
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -97,7 +99,7 @@ export function CategoryBarChart({
           tickFormatter={(v) => label(v)}
           className="text-xs"
         />
-        <YAxis domain={[0, 100]} className="text-xs" />
+        <YAxis domain={[0, 20]} className="text-xs" />
         <Tooltip labelFormatter={(v) => label(v as string)} />
         <Bar dataKey="avgScore" fill="#01696f" radius={[4, 4, 0, 0]} />
       </BarChart>

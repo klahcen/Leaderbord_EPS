@@ -8,7 +8,7 @@ export const claude = new Anthropic({
 export const anthropic = claude;
 
 export const CLAUDE_MODELS = {
-  SONNET: "claude-sonnet-4-20250514",
+  SONNET: "claude-sonnet-4-6",
   HAIKU: "claude-haiku-4-5",
 } as const;
 

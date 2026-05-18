@@ -3,32 +3,41 @@ import type Anthropic from "@anthropic-ai/sdk";
 export const extractProgressTool: Anthropic.Tool = {
   name: "extract_progress_entry",
   description:
-    "Extract a structured PE progress entry from a natural language description of a student's activity performance.",
+    "Extract a structured Moroccan PE procedural activity entry from a natural language description.",
   input_schema: {
     type: "object" as const,
     properties: {
-      category: {
+      family: {
+        type: "string",
+        enum: ["ATHLETISME", "SPORTS_COLLECTIFS", "GYMNASTIQUE"],
+        description: "Activity family from the Moroccan EPS program",
+      },
+      subActivity: {
         type: "string",
         enum: [
-          "RUNNING",
-          "JUMPING",
-          "SWIMMING",
-          "STRENGTH",
-          "FLEXIBILITY",
-          "ENDURANCE",
-          "COORDINATION",
-          "TEAMWORK",
+          "COURSE_VITESSE",
+          "COURSE_HAIES",
+          "COURSE_RELAIS",
+          "COURSE_ENDURANCE",
+          "SAUT_LONGUEUR",
+          "SAUT_HAUTEUR",
+          "TRIPLE_SAUT",
+          "LANCER_POIDS",
+          "LANCER_DISQUE",
+          "LANCER_JAVELOT",
+          "FOOTBALL",
+          "BASKETBALL",
+          "HANDBALL",
+          "RUGBY",
+          "VOLLEYBALL",
+          "BADMINTON",
+          "GYMNASTIQUE_SOL",
         ],
-        description: "The PE activity category",
+        description: "Specific sub-activity within the family",
       },
       score: {
         type: "number",
-        description:
-          "Normalized score from 0 to 100. Convert raw metrics (e.g., time, distance, reps) to a 0-100 scale.",
-      },
-      maxScore: {
-        type: "number",
-        description: "Maximum possible score, default 100",
+        description: "Student score from 0 to the family IAC max (14 for physical families)",
       },
       notes: {
         type: "string",
@@ -40,14 +49,14 @@ export const extractProgressTool: Anthropic.Tool = {
         description: "How confident you are in this extraction",
       },
     },
-    required: ["category", "score", "notes", "confidence"],
+    required: ["family", "subActivity", "score", "notes", "confidence"],
   },
 };
 
 export interface ExtractedProgress {
-  category: string;
+  family: string;
+  subActivity: string;
   score: number;
-  maxScore?: number;
   notes: string;
   confidence: "high" | "medium" | "low";
 }

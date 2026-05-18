@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   const logsSummary = student.progressLogs
     .map(
       (l) =>
-        `${l.recordedAt.toDateString()} | ${l.category} | Score: ${l.score}/${l.maxScore}${l.notes ? ` | ${l.notes}` : ""}`
+        `${l.recordedAt.toDateString()} | ${l.knowledgeDomain}/${l.criteria} | Score: ${l.score}/${l.iacMax} (S${l.semester})${l.notes ? ` | ${l.notes}` : ""}`
     )
     .join("\n");
 

@@ -12,11 +12,11 @@
     "description": "Overview of class performance and recent activity",
     "totalStudents": "Total Students",
     "weeklyLogs": "Logs This Week",
-    "avgScore": "Average Class Score",
+    "avgScore": "Average Class Mark",
     "topStudent": "Top Student",
-    "topStudentDesc": "{score}% avg",
+    "topStudentDesc": "{score}/20 avg",
     "recentActivity": "Recent Activity",
-    "scoreByCategory": "Score by Category",
+    "scoreByCategory": "Score by Domain",
     "top5": "Top 5 Students",
     "viewAll": "View all",
     "generateReport": "Generate Weekly Report",
@@ -117,7 +117,87 @@
     "scoreError": "Score must be between 0 and max score",
     "saveError": "Failed to save progress entry",
     "normalized": "{percent}% normalized",
-    "invalidScore": "Invalid score"
+    "invalidScore": "Invalid score",
+    "selectFamily": "Select activity family",
+    "selectGroup": "Select group",
+    "selectSubActivity": "Select sub-activity",
+    "iacMaxBadge": "Max: {max} pts",
+    "toolBadge": "Tool"
+  },
+  "activities": {
+    "ATHLETISME": "Athletics",
+    "SPORTS_COLLECTIFS": "Team Sports",
+    "GYMNASTIQUE": "Gymnastics",
+    "COURSES": "Running",
+    "SAUTS": "Jumps",
+    "LANCERS": "Throws",
+    "MARQUAGE_DEMARQUAGE": "Marking - Unmarking",
+    "SPORTS_RENVOI": "Racket Sports",
+    "SOL": "Floor Gymnastics",
+    "COURSE_VITESSE": "Sprint",
+    "COURSE_HAIES": "Hurdles",
+    "COURSE_RELAIS": "Relay",
+    "COURSE_ENDURANCE": "Endurance / Cross",
+    "SAUT_LONGUEUR": "Long Jump",
+    "SAUT_HAUTEUR": "High Jump",
+    "TRIPLE_SAUT": "Triple Jump",
+    "LANCER_POIDS": "Shot Put",
+    "LANCER_DISQUE": "Discus",
+    "LANCER_JAVELOT": "Javelin",
+    "FOOTBALL": "Football",
+    "BASKETBALL": "Basketball",
+    "HANDBALL": "Handball",
+    "RUGBY": "Rugby",
+    "VOLLEYBALL": "Volleyball",
+    "BADMINTON": "Badminton",
+    "GYMNASTIQUE_SOL": "Floor Gymnastics"
+  },
+  "evaluation": {
+    "domain": "Knowledge Domain",
+    "activity": "Physical Activity",
+    "criteria": "Evaluation Criteria",
+    "definition": "Definition",
+    "tool": "Evaluation Tool",
+    "iac": "IAC (Max Score)",
+    "score": "Student Score",
+    "semester": "Semester",
+    "sem1": "Semester 1",
+    "sem2": "Semester 2",
+    "scoreOutOf": "Score: {score} / {max}",
+    "finalMark": "Final Mark / 20",
+    "domains": {
+      "PROCEDURALE": "Procedural knowledge",
+      "CONCEPTUELLE": "Conceptual knowledge",
+      "COMPORTEMENTALE": "Behavioral knowledge"
+    },
+    "activities": {
+      "ATHLETISME": "Athletics",
+      "SPORTS_COLLECTIFS": "Team sports",
+      "GYMNASTIQUE": "Gymnastics",
+      "TOUTES_ACTIVITES": "All support activities"
+    },
+    "criteriaLabels": {
+      "HABILETE_MOTRICE": "Motor skill",
+      "COMPORTEMENT_MOTEUR": "Motor behavior",
+      "CAPACITE_INDIVIDUELLE": "Individual sporting capacity",
+      "CAPACITE_COLLECTIVE": "Collective sporting capacity",
+      "CAPACITE_GYMNASTIQUE": "Gymnastics capacity and motor skill",
+      "CONNAISSANCE_CONCEPTUELLE": "Concepts, rules, scientific knowledge",
+      "CONNAISSANCE_COMPORTEMENTALE": "Participation, behavior, autonomy, refereeing"
+    },
+    "definitions": {
+      "PRODUIT": "Product",
+      "PERFORMANCE": "Performance",
+      "PRODUIT_COMPORTEMENT_PHYSIQUE": "Physical behavior product",
+      "CONNAISSANCES_CONCEPTUELLES": "Conceptual knowledge and APS terminology",
+      "ABSENCE_TENU_ARBITRAGE": "Absence, kit, refereeing, organization, respect"
+    },
+    "tools": {
+      "CHRONOMETRE_DECAMETRE": "Stopwatch / Decameter",
+      "GRILLE_OBSERVATION": "Observation grid",
+      "QUESTIONS_REPONSES": "Oral and written Q&A",
+      "OBSERVATION_DIRECTE": "Direct observation throughout the cycle"
+    }
   },
   "leaderboard": {
     "title": "Class Leaderboard",
@@ -128,7 +208,8 @@
     "rank": "Rank",
     "student": "Student",
     "class": "Class",
-    "score": "Score",
+    "score": "Mark / 20",
+    "scoreValue": "{score}/20",
     "trend": "Trend",
     "allCategories": "All",
     "aiSpotlight": "Coach's AI Spotlight",
@@ -138,18 +219,18 @@
     "generatingSpotlight": "Generating spotlight...",
     "trendUp": "Up",
     "trendDown": "Down",
-    "trendStable": "Stable"
+    "trendStable": "Stable",
+    "familyShort": {
+      "ATHLETISME": "Ath.",
+      "SPORTS_COLLECTIFS": "Team",
+      "GYMNASTIQUE": "Gym."
+    }
   },
   "categories": {
     "ALL": "All",
-    "RUNNING": "Running",
-    "JUMPING": "Jumping",
-    "SWIMMING": "Swimming",
-    "STRENGTH": "Strength",
-    "FLEXIBILITY": "Flexibility",
-    "ENDURANCE": "Endurance",
-    "COORDINATION": "Coordination",
-    "TEAMWORK": "Teamwork"
+    "PROCEDURALE": "Procedural",
+    "CONCEPTUELLE": "Conceptual",
+    "COMPORTEMENTALE": "Behavioral"
   },
   "auth": {
     "login": "Login",

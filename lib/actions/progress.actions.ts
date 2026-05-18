@@ -4,7 +4,14 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { ProgressFormData } from "@/types";
-import type { Category } from "@prisma/client";
+import type {
+  ActivityFamily,
+  EvaluationCriteria,
+  EvaluationDefinition,
+  EvaluationTool,
+  KnowledgeDomain,
+  SubActivity,
+} from "@prisma/client";
 
 async function requireAuth() {
   const session = await auth();
@@ -19,9 +26,15 @@ export async function logProgress(data: ProgressFormData) {
     data: {
       studentId: data.studentId,
       professorId: session.user.id,
-      category: data.category as Category,
+      family: data.family as ActivityFamily,
+      subActivity: data.subActivity as SubActivity,
+      knowledgeDomain: data.knowledgeDomain as KnowledgeDomain,
+      criteria: data.criteria as EvaluationCriteria,
+      definition: data.definition as EvaluationDefinition,
+      tool: data.tool as EvaluationTool,
+      iacMax: data.iacMax,
       score: data.score,
-      maxScore: data.maxScore ?? 100,
+      semester: data.semester,
       notes: data.notes,
       recordedAt: data.recordedAt ?? new Date(),
     },
@@ -39,9 +52,15 @@ export async function updateProgress(id: string, data: ProgressFormData) {
     where: { id },
     data: {
       studentId: data.studentId,
-      category: data.category as Category,
+      family: data.family as ActivityFamily,
+      subActivity: data.subActivity as SubActivity,
+      knowledgeDomain: data.knowledgeDomain as KnowledgeDomain,
+      criteria: data.criteria as EvaluationCriteria,
+      definition: data.definition as EvaluationDefinition,
+      tool: data.tool as EvaluationTool,
+      iacMax: data.iacMax,
       score: data.score,
-      maxScore: data.maxScore ?? 100,
+      semester: data.semester,
       notes: data.notes,
       recordedAt: data.recordedAt ?? new Date(),
     },

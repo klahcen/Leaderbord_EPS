@@ -1,19 +1,7 @@
-export function normalizeScore(score: number, maxScore: number): number {
-  if (maxScore <= 0) return 0;
-  return Math.min(100, Math.max(0, (score / maxScore) * 100));
-}
+import { calculateMarkOutOf20, calculateLogPercent } from "@/lib/utils/moroccan-scoring";
 
-export function averageNormalizedScore(
-  logs: { score: number; maxScore: number }[]
-): number {
-  if (logs.length === 0) return 0;
-  const total = logs.reduce(
-    (sum, log) => sum + normalizeScore(log.score, log.maxScore),
-    0
-  );
-  return Math.round((total / logs.length) * 10) / 10;
-}
+export { calculateMarkOutOf20, calculateLogPercent };
 
-export function formatCategory(category: string): string {
-  return category.charAt(0) + category.slice(1).toLowerCase();
+export function formatMarkOutOf20(mark: number): string {
+  return `${mark.toFixed(2)}/20`;
 }

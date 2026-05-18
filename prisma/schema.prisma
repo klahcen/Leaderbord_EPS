@@ -18,15 +18,72 @@ enum Gender {
   OTHER
 }
 
-enum Category {
-  RUNNING
-  JUMPING
-  SWIMMING
-  STRENGTH
-  FLEXIBILITY
-  ENDURANCE
-  COORDINATION
-  TEAMWORK
+enum KnowledgeDomain {
+  PROCEDURALE
+  CONCEPTUELLE
+  COMPORTEMENTALE
+}
+
+enum ActivityFamily {
+  ATHLETISME
+  SPORTS_COLLECTIFS
+  GYMNASTIQUE
+}
+
+enum SubActivity {
+  COURSE_VITESSE
+  COURSE_HAIES
+  COURSE_RELAIS
+  COURSE_ENDURANCE
+  SAUT_LONGUEUR
+  SAUT_HAUTEUR
+  TRIPLE_SAUT
+  LANCER_POIDS
+  LANCER_DISQUE
+  LANCER_JAVELOT
+  FOOTBALL
+  BASKETBALL
+  HANDBALL
+  RUGBY
+  VOLLEYBALL
+  BADMINTON
+  GYMNASTIQUE_SOL
+}
+
+enum AthletismeGroup {
+  COURSES
+  SAUTS
+  LANCERS
+}
+
+enum SportsCollectifsType {
+  MARQUAGE_DEMARQUAGE
+  SPORTS_RENVOI
+}
+
+enum EvaluationCriteria {
+  HABILETE_MOTRICE
+  COMPORTEMENT_MOTEUR
+  CAPACITE_INDIVIDUELLE
+  CAPACITE_COLLECTIVE
+  CAPACITE_GYMNASTIQUE
+  CONNAISSANCE_CONCEPTUELLE
+  CONNAISSANCE_COMPORTEMENTALE
+}
+
+enum EvaluationDefinition {
+  PRODUIT
+  PERFORMANCE
+  PRODUIT_COMPORTEMENT_PHYSIQUE
+  CONNAISSANCES_CONCEPTUELLES
+  ABSENCE_TENU_ARBITRAGE
+}
+
+enum EvaluationTool {
+  CHRONOMETRE_DECAMETRE
+  GRILLE_OBSERVATION
+  QUESTIONS_REPONSES
+  OBSERVATION_DIRECTE
 }
 
 model User {
@@ -66,21 +123,30 @@ model Student {
 }
 
 model ProgressLog {
-  id          String   @id @default(cuid())
-  studentId   String
-  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  professorId String
-  professor   User     @relation(fields: [professorId], references: [id])
-  category    Category
-  score       Float
-  maxScore    Float    @default(100)
-  notes       String?
-  recordedAt  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String               @id @default(cuid())
+  studentId       String
+  student         Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  professorId     String
+  professor       User                 @relation(fields: [professorId], references: [id])
+
+  family          ActivityFamily
+  subActivity     SubActivity
+  knowledgeDomain KnowledgeDomain
+  criteria        EvaluationCriteria
+  definition      EvaluationDefinition
+  tool            EvaluationTool
+  iacMax          Int
+  score           Float
+  semester        Int                  @default(1)
+  notes           String?
+  recordedAt      DateTime             @default(now())
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@index([studentId])
   @@index([professorId])
-  @@index([category])
+  @@index([family])
+  @@index([subActivity])
+  @@index([knowledgeDomain])
   @@index([recordedAt])
 }

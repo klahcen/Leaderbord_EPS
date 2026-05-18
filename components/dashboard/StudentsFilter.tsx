@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,6 +28,7 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
   const searchParams = useSearchParams();
   const t = useTranslations("students");
   const [search, setSearch] = useState(current.search ?? "");
+  const [isPending, startTransition] = useTransition();
 
   function applyFilters(updates: Record<string, string>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -36,11 +37,15 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
       else params.delete(key);
     });
     params.delete("page");
-    router.push(`/dashboard/students?${params.toString()}`);
+    startTransition(() => {
+      router.push(`/dashboard/students?${params.toString()}`);
+    });
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div
+      className={`flex flex-wrap gap-3 transition-opacity ${isPending ? "pointer-events-none opacity-60" : ""}`}
+    >
       <Input
         placeholder={t("searchPlaceholder")}
         value={search}

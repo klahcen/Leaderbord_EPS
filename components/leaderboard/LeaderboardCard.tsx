@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 import type { LeaderboardEntry } from "@/types";
 
-function scoreClass(avg: number) {
-  if (avg >= 80) return "high";
-  if (avg >= 50) return "medium";
+function scoreClass(mark: number) {
+  if (mark >= 14) return "high";
+  if (mark >= 10) return "medium";
   return "low";
 }
 
@@ -40,13 +40,19 @@ export function LeaderboardCardList({ students }: { students: LeaderboardEntry[]
             <div className="score-bar-track mt-2">
               <span
                 className={`score-bar-fill ${scoreClass(student.avgScore)}`}
-                style={{ width: `${Math.min(Math.max(student.avgScore, 0), 100)}%` }}
+                style={{
+                  width: `${Math.min(Math.max((student.avgScore / 20) * 100, 0), 100)}%`,
+                }}
               />
             </div>
           </div>
           <div className="text-right">
             <Badge>
-              {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
+              {format.number(student.avgScore, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              /20
             </Badge>
             <div className="mt-1 flex justify-end">
               {student.trend === "up" && (

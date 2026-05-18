@@ -1,11 +1,19 @@
 "use client";
 
 import { useTranslations, useFormatter } from "next-intl";
-import type { LeaderboardEntry } from "@/types";
+import { FAMILY_ICONS } from "@/lib/activity-config";
+import type { ActivityFamily } from "@prisma/client";
+import { emptyFamilyScores, type LeaderboardEntry } from "@/types";
 
-function scoreClass(avg: number) {
-  if (avg >= 80) return "high";
-  if (avg >= 50) return "medium";
+const FAMILIES: ActivityFamily[] = [
+  "ATHLETISME",
+  "SPORTS_COLLECTIFS",
+  "GYMNASTIQUE",
+];
+
+function scoreClass(mark: number) {
+  if (mark >= 14) return "high";
+  if (mark >= 10) return "medium";
   return "low";
 }
 
@@ -23,6 +31,7 @@ function TrendCell({ trend }: { trend: "up" | "down" | "stable" }) {
 
 export function LeaderboardTable({ students }: { students: LeaderboardEntry[] }) {
   const t = useTranslations("leaderboard");
+  const tAct = useTranslations("activities");
   const format = useFormatter();
 
   const medal = (rank: number) =>
@@ -36,6 +45,16 @@ export function LeaderboardTable({ students }: { students: LeaderboardEntry[] })
             <th>{t("rank")}</th>
             <th>{t("student")}</th>
             <th>{t("class")}</th>
+            {FAMILIES.map((family) => (
+              <th key={family} className="text-center whitespace-nowrap">
+                <span title={tAct(family)}>
+                  {FAMILY_ICONS[family]}{" "}
+                  <span className="hidden lg:inline">
+                    {t(`familyShort.${family}`)}
+                  </span>
+                </span>
+              </th>
+            ))}
             <th>{t("score")}</th>
             <th>{t("trend")}</th>
           </tr>
@@ -69,17 +88,43 @@ export function LeaderboardTable({ students }: { students: LeaderboardEntry[] })
               <td>
                 <span className="badge-neutral">{student.className}</span>
               </td>
+              {FAMILIES.map((family) => {
+                const scores = student.familyScores ?? emptyFamilyScores();
+                const mark = scores[family];
+                return (
+                  <td key={family} className="text-center tabular-nums">
+                    {mark > 0
+                      ? format.number(mark, {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 1,
+                        })
+                      : "—"}
+                  </td>
+                );
+              })}
               <td>
                 <div className="score-bar">
                   <div className="score-bar-track" role="presentation">
                     <span
                       className={`score-bar-fill ${scoreClass(student.avgScore)}`}
-                      style={{ width: `${Math.min(Math.max(student.avgScore, 0), 100)}%` }}
-                      title={`${format.number(student.avgScore, { maximumFractionDigits: 1 })}%`}
+                      style={{
+                        width: `${Math.min(Math.max((student.avgScore / 20) * 100, 0), 100)}%`,
+                      }}
+                      title={t("scoreValue", {
+                        score: format.number(student.avgScore, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }),
+                      })}
                     />
                   </div>
-                  <strong className="min-w-[3rem] shrink-0 text-right tabular-nums">
-                    {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
+                  <strong className="min-w-[3.5rem] shrink-0 text-right tabular-nums">
+                    {t("scoreValue", {
+                      score: format.number(student.avgScore, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }),
+                    })}
                   </strong>
                 </div>
               </td>

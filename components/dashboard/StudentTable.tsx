@@ -84,14 +84,18 @@ export function StudentTable({
                   <div className="flex items-center gap-2">
                     <div className="score-bar-track w-24">
                       <span
-                        className={`score-bar-fill ${student.avgScore >= 80 ? "high" : student.avgScore >= 50 ? "medium" : "low"}`}
+                        className={`score-bar-fill ${student.avgScore >= 14 ? "high" : student.avgScore >= 10 ? "medium" : "low"}`}
                         style={{
-                          width: `${Math.min(Math.max(student.avgScore, 0), 100)}%`,
+                          width: `${Math.min(Math.max((student.avgScore / 20) * 100, 0), 100)}%`,
                         }}
                       />
                     </div>
                     <span>
-                      {format.number(student.avgScore, { maximumFractionDigits: 1 })}%
+                      {format.number(student.avgScore, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                      /20
                     </span>
                   </div>
                 </td>
@@ -148,14 +152,14 @@ export function RecentActivityFeed({
   logs: {
     id: string;
     studentName: string;
-    category: string;
+    criteria: string;
     score: number;
-    maxScore: number;
+    iacMax: number;
     recordedAt: Date;
   }[];
 }) {
   const t = useTranslations("dashboard");
-  const tCat = useTranslations("categories");
+  const tEval = useTranslations("evaluation");
   const format = useFormatter();
 
   if (logs.length === 0) {
@@ -176,16 +180,12 @@ export function RecentActivityFeed({
           <div>
             <p className="font-medium">{log.studentName}</p>
             <p className="text-sm text-muted-foreground">
-              {tCat(log.category as "RUNNING")}
+              {tEval(`criteriaLabels.${log.criteria as "HABILETE_MOTRICE"}`)}
             </p>
           </div>
           <div className="text-right">
             <p className="font-semibold text-primary">
-              {format.number(
-                Math.round((log.score / log.maxScore) * 100),
-                { maximumFractionDigits: 0 }
-              )}
-              %
+              {tEval("scoreOutOf", { score: log.score, max: log.iacMax })}
             </p>
             <p className="text-xs text-muted-foreground">
               {format.dateTime(new Date(log.recordedAt), { dateStyle: "medium" })}

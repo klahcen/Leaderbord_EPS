@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, getFormatter } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
+import { parseLeaderboardCategory } from "@/lib/constants/leaderboard-categories";
+import { calculateMarkOutOf20 } from "@/lib/utils/moroccan-scoring";
 import { Header } from "@/components/dashboard/Header";
 import { ProgressLineChart } from "@/components/dashboard/ProgressChart";
 import { StudentProgressFilter } from "@/components/dashboard/StudentProgressFilter";
@@ -9,6 +11,7 @@ import { AIAnalysisButton } from "@/components/dashboard/AIAnalysisButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import type { KnowledgeDomain } from "@prisma/client";
 
 interface PageProps {
   params: { id: string };
@@ -20,8 +23,10 @@ export default async function StudentDetailPage({
   searchParams,
 }: PageProps) {
   const t = await getTranslations("students");
-  const tCat = await getTranslations("categories");
+  const tEval = await getTranslations("evaluation");
+  const tAct = await getTranslations("activities");
   const format = await getFormatter();
+  const domainFilter = parseLeaderboardCategory(searchParams.category);
 
   const student = await prisma.student.findUnique({
     where: { id: params.id },
@@ -29,8 +34,12 @@ export default async function StudentDetailPage({
       schoolClass: true,
       progressLogs: {
         orderBy: { recordedAt: "desc" },
-        ...(searchParams.category && searchParams.category !== "ALL"
-          ? { where: { category: searchParams.category as never } }
+        ...(domainFilter !== "ALL"
+          ? {
+              where: {
+                knowledgeDomain: domainFilter as KnowledgeDomain,
+              },
+            }
           : {}),
       },
     },
@@ -38,17 +47,9 @@ export default async function StudentDetailPage({
 
   if (!student) notFound();
 
-  const avgScore =
-    student.progressLogs.length > 0
-      ? Math.round(
-          (student.progressLogs.reduce(
-            (s, l) => s + (l.score / l.maxScore) * 100,
-            0
-          ) /
-            student.progressLogs.length) *
-            10
-        ) / 10
-      : 0;
+  const totalScore = student.progressLogs.reduce((s, l) => s + l.score, 0);
+  const totalMax = student.progressLogs.reduce((s, l) => s + l.iacMax, 0);
+  const markOutOf20 = calculateMarkOutOf20(totalScore, totalMax);
 
   return (
     <div>
@@ -91,9 +92,13 @@ export default async function StudentDetailPage({
             </div>
           )}
           <div>
-            <p className="text-sm text-muted-foreground">{t("detailAvgScore")}</p>
+            <p className="text-sm text-muted-foreground">{tEval("finalMark")}</p>
             <p className="text-2xl font-bold text-primary">
-              {format.number(avgScore, { maximumFractionDigits: 1 })}%
+              {format.number(markOutOf20, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+              /20
             </p>
           </div>
         </CardContent>
@@ -104,10 +109,7 @@ export default async function StudentDetailPage({
       </div>
 
       <div className="mb-6">
-        <StudentProgressFilter
-          studentId={student.id}
-          active={searchParams.category ?? "ALL"}
-        />
+        <StudentProgressFilter studentId={student.id} active={domainFilter} />
       </div>
 
       <div className="mb-8 grid gap-6 lg:grid-cols-2">
@@ -136,8 +138,8 @@ export default async function StudentDetailPage({
                 <thead>
                   <tr className="border-b">
                     <th className="py-2 text-left">{t("date")}</th>
-                    <th className="py-2 text-left">{t("category")}</th>
-                    <th className="py-2 text-left">{t("avgScore")}</th>
+                    <th className="py-2 text-left">{tEval("activity")}</th>
+                    <th className="py-2 text-left">{tEval("score")}</th>
                     <th className="py-2 text-left"></th>
                   </tr>
                 </thead>
@@ -150,14 +152,15 @@ export default async function StudentDetailPage({
                         })}
                       </td>
                       <td className="py-2">
-                        <Badge variant="outline">{tCat(log.category)}</Badge>
+                        <Badge variant="outline">
+                          {tAct(log.subActivity)}
+                        </Badge>
                       </td>
                       <td className="py-2 font-medium">
-                        {format.number(
-                          Math.round((log.score / log.maxScore) * 100),
-                          { maximumFractionDigits: 0 }
-                        )}
-                        %
+                        {tEval("scoreOutOf", {
+                          score: log.score,
+                          max: log.iacMax,
+                        })}
                       </td>
                       <td className="py-2 text-right">
                         <Button variant="ghost" size="sm" asChild>

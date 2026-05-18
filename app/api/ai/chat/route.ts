@@ -44,22 +44,19 @@ export async function POST(req: NextRequest) {
   const recentActivity = recentLogs
     .map(
       (l) =>
-        `${l.student.name} (${l.student.schoolClass?.name ?? "No class"}): ${l.category} ${l.score}/${l.maxScore}`
+        `${l.student.name} (${l.student.schoolClass?.name ?? "No class"}): ${l.criteria} ${l.score}/${l.iacMax}`
     )
     .join("; ");
 
   const studentSummary = allStudents
     .map((s) => {
+      const totalScore = s.progressLogs.reduce((sum, l) => sum + l.score, 0);
+      const totalMax = s.progressLogs.reduce((sum, l) => sum + l.iacMax, 0);
       const avg =
-        s.progressLogs.length > 0
-          ? (
-              s.progressLogs.reduce(
-                (sum, l) => sum + (l.score / l.maxScore) * 100,
-                0
-              ) / s.progressLogs.length
-            ).toFixed(0)
+        totalMax > 0
+          ? ((totalScore / totalMax) * 20).toFixed(2)
           : "N/A";
-      return `${s.name} (${s.schoolClass?.name ?? "No class"}): ${avg}% avg`;
+      return `${s.name} (${s.schoolClass?.name ?? "No class"}): ${avg}/20`;
     })
     .join("\n");
 

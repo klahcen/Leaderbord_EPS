@@ -1,11 +1,39 @@
-import type { Category, Gender, Role } from "@prisma/client";
+import type {
+  ActivityFamily,
+  EvaluationCriteria,
+  EvaluationDefinition,
+  EvaluationTool,
+  Gender,
+  KnowledgeDomain,
+  Role,
+  SubActivity,
+} from "@prisma/client";
 
-export type { Category, Gender, Role };
+export type {
+  ActivityFamily,
+  EvaluationCriteria,
+  EvaluationDefinition,
+  EvaluationTool,
+  Gender,
+  KnowledgeDomain,
+  Role,
+  SubActivity,
+};
 
 export interface ClassOption {
   id: string;
   name: string;
   code: string;
+}
+
+export interface FamilyScoreBreakdown {
+  ATHLETISME: number;
+  SPORTS_COLLECTIFS: number;
+  GYMNASTIQUE: number;
+}
+
+export function emptyFamilyScores(): FamilyScoreBreakdown {
+  return { ATHLETISME: 0, SPORTS_COLLECTIFS: 0, GYMNASTIQUE: 0 };
 }
 
 export interface LeaderboardEntry {
@@ -14,7 +42,9 @@ export interface LeaderboardEntry {
   studentCode: string;
   className: string;
   avatarUrl: string | null;
+  /** Final mark out of 20 (Moroccan grid) */
   avgScore: number;
+  familyScores: FamilyScoreBreakdown;
   totalLogs: number;
   trend: "up" | "down" | "stable";
   lastActivity: Date | undefined;
@@ -23,9 +53,15 @@ export interface LeaderboardEntry {
 
 export interface ProgressFormData {
   studentId: string;
-  category: Category;
+  family: ActivityFamily;
+  subActivity: SubActivity;
+  knowledgeDomain: KnowledgeDomain;
+  criteria: EvaluationCriteria;
+  definition: EvaluationDefinition;
+  tool: EvaluationTool;
+  iacMax: number;
   score: number;
-  maxScore?: number;
+  semester: number;
   notes?: string;
   recordedAt?: Date;
 }

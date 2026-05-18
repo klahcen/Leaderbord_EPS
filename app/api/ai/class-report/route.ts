@@ -31,15 +31,13 @@ export async function POST(req: Request) {
 
   const classSummary = students
     .map((s) => {
-      const avg = s.progressLogs.length
-        ? (
-            s.progressLogs.reduce(
-              (sum, l) => sum + (l.score / l.maxScore) * 100,
-              0
-            ) / s.progressLogs.length
-          ).toFixed(1)
-        : "no data";
-      return `- ${s.name} (${s.schoolClass?.name ?? "No class"}): avg score ${avg}%, ${s.progressLogs.length} recent logs`;
+      const totalScore = s.progressLogs.reduce((sum, l) => sum + l.score, 0);
+      const totalMax = s.progressLogs.reduce((sum, l) => sum + l.iacMax, 0);
+      const avg =
+        totalMax > 0
+          ? ((totalScore / totalMax) * 20).toFixed(2)
+          : "no data";
+      return `- ${s.name} (${s.schoolClass?.name ?? "No class"}): mark ${avg}/20, ${s.progressLogs.length} recent logs`;
     })
     .join("\n");
 

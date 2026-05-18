@@ -828,6 +828,8 @@
   background: var(--color-surface);
   text-decoration: none;
   transition: all var(--transition-interactive);
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .category-tab:hover {

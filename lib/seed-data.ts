@@ -1,9 +1,16 @@
-import type { Category, Gender } from "@prisma/client";
+import type { ActivityFamily, Gender, SubActivity } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { ALL_SUB_ACTIVITIES } from "@/lib/activity-config";
+import { flattenGridEntries } from "@/lib/evaluation-grid";
 
 const CANONICAL_CLASS_CODES = ["CLA001", "CLA002", "CLA003"] as const;
 
-/** Remove duplicate class rows (e.g. from pre-migration data) keeping CLA001–003. */
+const DEFAULT_SUB_BY_FAMILY: Record<ActivityFamily, SubActivity> = {
+  ATHLETISME: "COURSE_VITESSE",
+  SPORTS_COLLECTIFS: "FOOTBALL",
+  GYMNASTIQUE: "GYMNASTIQUE_SOL",
+};
+
 export async function dedupeSchoolClasses() {
   for (const code of CANONICAL_CLASS_CODES) {
     const keep = await prisma.schoolClass.findUnique({ where: { code } });
@@ -47,10 +54,7 @@ export async function upsertSchoolClasses() {
   ]);
 }
 
-export async function upsertSeedStudent(
-  index: number,
-  classId: string
-) {
+export async function upsertSeedStudent(index: number, classId: string) {
   const code = `STU${String(index + 1).padStart(3, "0")}`;
   return prisma.student.upsert({
     where: { studentCode: code },
@@ -65,23 +69,41 @@ export async function upsertSeedStudent(
   });
 }
 
+const GRID_ENTRIES = flattenGridEntries().map((entry) => ({
+  ...entry,
+  family:
+    entry.family === "TOUTES_ACTIVITES"
+      ? ("ATHLETISME" as ActivityFamily)
+      : (entry.family as ActivityFamily),
+  subActivity: DEFAULT_SUB_BY_FAMILY[
+    entry.family === "TOUTES_ACTIVITES"
+      ? "ATHLETISME"
+      : (entry.family as ActivityFamily)
+  ],
+}));
+
 export async function createProgressLog(data: {
   studentId: string;
   professorId: string;
-  category: Category;
+  family: ActivityFamily;
+  subActivity: SubActivity;
+  knowledgeDomain: (typeof GRID_ENTRIES)[number]["knowledgeDomain"];
+  criteria: (typeof GRID_ENTRIES)[number]["criteria"];
+  definition: (typeof GRID_ENTRIES)[number]["definition"];
+  tool: (typeof GRID_ENTRIES)[number]["tool"];
+  iacMax: number;
   score: number;
+  semester: number;
   notes: string | null;
   recordedAt: Date;
 }) {
-  return prisma.progressLog.create({
-    data: {
-      studentId: data.studentId,
-      professorId: data.professorId,
-      category: data.category,
-      score: data.score,
-      maxScore: 100,
-      notes: data.notes,
-      recordedAt: data.recordedAt,
-    },
-  });
+  return prisma.progressLog.create({ data });
+}
+
+export function getSeedGridEntries() {
+  return GRID_ENTRIES;
+}
+
+export function getSeedSubActivities() {
+  return ALL_SUB_ACTIVITIES;
 }
