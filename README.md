@@ -1,36 +1,200 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tableau de bord PE Sport (Classement EPS)
 
-## Getting Started
+Application web pour les professeurs d'Éducation Physique et Sportive (EPS) au Maroc : suivi des progrès des élèves, gestion des classes et affichage d'un classement public. Conçue autour de la grille d'évaluation marocaine (domaines de connaissances procédurale, conceptuelle et comportementale).
 
-First, run the development server:
+## Fonctionnalités
+
+- **Classement public** — Classements par domaine de connaissance (procédural, conceptuel, comportemental) avec podium et analyses IA en vedette
+- **Tableau de bord professeur** — Espace protégé pour gérer les élèves, les classes et les fiches de progression
+- **Notation EPS marocaine** — Familles d'activités (athlétisme, sports collectifs, gymnastique), sous-activités, critères d'évaluation et notation basée sur l'IAC
+- **Assistant IA** (optionnel) — Propulsé par Anthropic Claude :
+  - Saisie de progression en langage naturel
+  - Analyse par élève
+  - Rapports hebdomadaires de classe
+  - Widget de chat intégré
+- **Internationalisation** — Anglais, français et arabe (`next-intl`)
+- **Thème sombre / clair**
+
+## Stack technique
+
+| Couche | Technologie |
+|--------|-------------|
+| Framework | [Next.js 14](https://nextjs.org/) (App Router) |
+| Langage | TypeScript |
+| Interface | React 18, [Tailwind CSS](https://tailwindcss.com/), [Radix UI](https://www.radix-ui.com/), icônes [Lucide](https://lucide.dev/) |
+| Graphiques | [Recharts](https://recharts.org/) |
+| Authentification | [NextAuth.js v5](https://authjs.dev/) (identifiants email/mot de passe) |
+| Base de données | [PostgreSQL](https://www.postgresql.org/) + [Prisma ORM](https://www.prisma.io/) |
+| IA | [Anthropic Claude SDK](https://docs.anthropic.com/) (`claude-sonnet-4-6`, `claude-haiku-4-5`) |
+| i18n | [next-intl](https://next-intl.dev/) |
+| Validation | [Zod](https://zod.dev/) |
+| Markdown | react-markdown (rendu des réponses IA) |
+| Hachage des mots de passe | bcryptjs |
+| Dates | date-fns |
+| Linting | ESLint + eslint-config-next |
+| Déploiement | Docker, [Railway](https://railway.app/) |
+
+## Structure du projet
+
+```
+app/
+  (auth)/login/          # Connexion professeur
+  (dashboard)/dashboard/ # Tableau de bord protégé (élèves, progression, stats)
+  leaderboard/           # Classement public
+  api/                   # Routes API REST (élèves, classes, progression, IA, auth)
+components/
+  dashboard/             # UI du tableau de bord (sidebar, graphiques, formulaires, tableaux)
+  leaderboard/           # UI du classement (podium, filtres, spotlight IA)
+  ai/                    # Widget de chat IA et rendu markdown
+  ui/                    # Composants UI partagés (bouton, carte, input, etc.)
+lib/
+  actions/               # Server actions (élèves, classes, progression)
+  utils/                 # Helpers scoring, classement, statistiques
+  ai/                    # Outils et prompts Claude
+  constants/             # Catégories du classement
+prisma/
+  schema.prisma          # Schéma de la base de données
+  seed.ts                # Données de démo + compte professeur
+messages/                # Chaînes i18n (en, fr, ar)
+```
+
+## Prérequis
+
+- Node.js 20+
+- npm
+- Docker (optionnel, pour PostgreSQL en local)
+- Clé API Anthropic (optionnelle, pour les fonctionnalités IA)
+
+## Démarrage
+
+### 1. Installer les dépendances
+
+```bash
+npm install
+# ou
+make install
+```
+
+### 2. Configurer l'environnement
+
+Copiez le fichier d'exemple et renseignez les valeurs :
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Obligatoire | Description |
+|----------|-------------|-------------|
+| `DATABASE_URL` | Oui | Chaîne de connexion PostgreSQL |
+| `AUTH_SECRET` | Oui | Secret de session (`openssl rand -base64 32`) |
+| `NEXTAUTH_SECRET` | Oui | Identique à `AUTH_SECRET` pour NextAuth |
+| `ANTHROPIC_API_KEY` | Non | Active les fonctionnalités IA |
+| `AUTH_URL` | Production uniquement | URL publique de l'app (ex. `https://your-app.up.railway.app`) |
+
+### 3. Démarrer la base de données
+
+**Avec Docker (recommandé en local) :**
+
+```bash
+make db-up        # Démarre Postgres sur le port 5434
+make db-setup     # db-up + schéma + données de démo
+```
+
+**Ou manuellement :**
+
+```bash
+make db-push      # Applique le schéma Prisma
+npm run db:seed   # Insère les données de démo
+```
+
+### 4. Lancer le serveur de développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# ou
+make dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrez [http://localhost:3000](http://localhost:3000) — l'application redirige vers `/leaderboard`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Se connecter en tant que professeur
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Après le seed, utilisez les identifiants définis dans `prisma/seed.ts` :
 
-## Learn More
+- **Email :** `Aya@sefyani.lakrizi`
+- **Mot de passe :** `LAHCEN@AYA2026`
 
-To learn more about Next.js, take a look at the following resources:
+Les routes du tableau de bord (`/dashboard/*`) nécessitent une authentification.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts disponibles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Commande | Description |
+|----------|-------------|
+| `npm run dev` | Démarrer le serveur de développement |
+| `npm run build` | Générer le client Prisma + build de production |
+| `npm run start` | Démarrer le serveur de production |
+| `npm run lint` | Lancer ESLint |
+| `npm run db:push` | Pousser le schéma vers la base de données |
+| `npm run db:seed` | Insérer les données de démo |
+| `npm run db:studio` | Ouvrir Prisma Studio |
+| `npm run railway:start` | Pousser le schéma puis démarrer (déploiement Railway) |
 
-## Deploy on Vercel
+### Raccourcis Makefile
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Exécutez `make help` pour la liste complète. Cibles courantes :
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+make db-setup       # Configuration locale initiale (DB + schéma + seed)
+make env-check      # Vérifier que les variables d'environnement sont définies
+make docker-build   # Construire l'image Docker
+make docker-run     # Lancer le conteneur en local
+```
+
+## Routes API
+
+| Route | Rôle |
+|-------|------|
+| `GET /api/health` | Vérification de santé (utilisée par Railway) |
+| `POST /api/auth/[...nextauth]` | Authentification |
+| `GET/POST /api/students` | Lister / créer des élèves |
+| `GET/PATCH/DELETE /api/students/[id]` | CRUD élève |
+| `GET/POST /api/classes` | Lister / créer des classes |
+| `GET/PATCH/DELETE /api/classes/[id]` | CRUD classe |
+| `GET/POST /api/progress` | Lister / créer des fiches de progression |
+| `GET/PATCH/DELETE /api/progress/[id]` | CRUD fiche de progression |
+| `POST /api/ai/parse-progress` | IA : convertir du langage naturel en fiche de progression |
+| `POST /api/ai/analyze-student` | IA : analyse des performances d'un élève |
+| `POST /api/ai/class-report` | IA : rapport hebdomadaire de classe (streaming) |
+| `POST /api/ai/chat` | IA : chat intégré |
+| `GET /api/leaderboard/insights` | IA : analyses en vedette du classement |
+
+## Déploiement (Railway)
+
+Le projet inclut un `Dockerfile` et un `railway.toml` pour le déploiement sur Railway.
+
+**Variables Railway requises :**
+
+```
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+AUTH_SECRET=<openssl rand -base64 32>
+AUTH_URL=https://your-app.up.railway.app
+ANTHROPIC_API_KEY=<optionnel>
+```
+
+**Build :** `npm run build`  
+**Démarrage :** `npm run railway:start` (exécute `prisma db push` puis sert l'application)
+
+Point de contrôle de santé : `/api/health`
+
+## Modèle de données (aperçu)
+
+- **User** — Professeurs et administrateurs (authentification par identifiants)
+- **SchoolClass** — Groupes de classes avec nom/code uniques
+- **Student** — Élèves liés à une classe, avec âge/genre/avatar optionnels
+- **ProgressLog** — Entrées d'évaluation liées à la grille EPS marocaine (famille d'activité, sous-activité, domaine de connaissance, critères, score, semestre, etc.)
+
+Consultez `prisma/schema.prisma` pour le schéma complet et les énumérations.
+
+## Licence
+
+Projet privé.
