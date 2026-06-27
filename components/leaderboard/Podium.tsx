@@ -1,6 +1,7 @@
 "use client";
 
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
+import { QualitativeGradeDisplay } from "@/components/QualitativeGradeDisplay";
 import type { LeaderboardEntry } from "@/types";
 
 const slots = [
@@ -11,7 +12,6 @@ const slots = [
 
 export function Podium({ top3 }: { top3: LeaderboardEntry[] }) {
   const t = useTranslations("leaderboard");
-  const format = useFormatter();
 
   if (top3.length === 0) {
     return (
@@ -42,14 +42,11 @@ export function Podium({ top3 }: { top3: LeaderboardEntry[] }) {
             <span className={`podium-avatar ${slot.rankClass}`}>{initials}</span>
             <p className="text-center text-sm font-bold">{student.name}</p>
             <p className="text-xs text-muted-foreground">{student.className}</p>
-            <span className="badge-pink">
-              {t("scoreValue", {
-                score: format.number(student.avgScore, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }),
-              })}
-            </span>
+            <QualitativeGradeDisplay
+              markOutOf20={student.avgScore}
+              showBar={false}
+              labelClassName="badge-pink inline-block rounded-full px-3 py-1 text-xs"
+            />
             <span className={`podium-block ${slot.rankClass}`}>#{student.rank}</span>
           </article>
         );

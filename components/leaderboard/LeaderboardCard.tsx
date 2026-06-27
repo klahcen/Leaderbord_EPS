@@ -1,19 +1,11 @@
 "use client";
 
-import { useFormatter } from "next-intl";
+import { QualitativeGradeDisplay } from "@/components/QualitativeGradeDisplay";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 import type { LeaderboardEntry } from "@/types";
 
-function scoreClass(mark: number) {
-  if (mark >= 14) return "high";
-  if (mark >= 10) return "medium";
-  return "low";
-}
-
 export function LeaderboardCardList({ students }: { students: LeaderboardEntry[] }) {
-  const format = useFormatter();
 
   return (
     <div className="space-y-3 md:hidden">
@@ -37,23 +29,11 @@ export function LeaderboardCardList({ students }: { students: LeaderboardEntry[]
           <div className="flex-1">
             <p className="font-medium">{student.name}</p>
             <p className="text-xs text-muted-foreground">{student.className}</p>
-            <div className="score-bar-track mt-2">
-              <span
-                className={`score-bar-fill ${scoreClass(student.avgScore)}`}
-                style={{
-                  width: `${Math.min(Math.max((student.avgScore / 20) * 100, 0), 100)}%`,
-                }}
-              />
+            <div className="mt-2">
+              <QualitativeGradeDisplay markOutOf20={student.avgScore} />
             </div>
           </div>
           <div className="text-right">
-            <Badge>
-              {format.number(student.avgScore, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              /20
-            </Badge>
             <div className="mt-1 flex justify-end">
               {student.trend === "up" && (
                 <TrendingUp className="h-4 w-4 text-green-600" />

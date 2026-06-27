@@ -8,6 +8,13 @@ import { Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { logProgress, updateProgress } from "@/lib/actions/progress.actions";
 import {
   ACTIVITY_TREE,
@@ -22,9 +29,14 @@ import {
   type ActivityGroupKey,
 } from "@/lib/activity-config";
 import {
-  calculateLogPercent,
-  scoreColorClass,
-} from "@/lib/utils/moroccan-scoring";
+  QUALITATIVE_GRADES,
+  qualitativeGradeBarClass,
+  qualitativeGradeColorClass,
+  qualitativeGradePercent,
+  qualitativeGradeToScore,
+  scoreToQualitativeGrade,
+  type QualitativeGrade,
+} from "@/lib/utils/qualitative-grades";
 import type { ProgressFormData } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -125,7 +137,12 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
   const [subActivity, setSubActivity] = useState<SubActivity | "">(
     initialData?.subActivity ?? ""
   );
-  const [score, setScore] = useState(initialData?.score?.toString() ?? "");
+  const [grade, setGrade] = useState<QualitativeGrade | "">(() => {
+    if (initialData?.score != null && initialData?.iacMax) {
+      return scoreToQualitativeGrade(initialData.score, initialData.iacMax);
+    }
+    return "";
+  });
   const [semester, setSemester] = useState(initialData?.semester ?? 1);
   const [notes, setNotes] = useState(initialData?.notes ?? "");
   const [recordedAt, setRecordedAt] = useState(
@@ -147,14 +164,9 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
   const selectedStudent = students.find((s) => s.id === studentId);
   const familyDefaults = family ? getFamilyEvaluationDefaults(family) : null;
   const iacMax = familyDefaults?.iacMax ?? 0;
-  const scoreNum = parseFloat(score);
-  const scoreValid =
-    familyDefaults != null &&
-    subActivity !== "" &&
-    !isNaN(scoreNum) &&
-    scoreNum >= 0 &&
-    scoreNum <= iacMax;
-  const scorePercent = familyDefaults ? calculateLogPercent(scoreNum, iacMax) : 0;
+  const gradeValid = grade !== "" && familyDefaults != null && subActivity !== "";
+  const gradePercent = grade ? qualitativeGradePercent(grade) : 0;
+  const scoreNum = grade ? qualitativeGradeToScore(grade, iacMax) : 0;
 
   const summary =
     family && groupKey && subActivity
@@ -169,18 +181,18 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
     setSubActivity(
       next === "GYMNASTIQUE" ? (activities[0]?.value as SubActivity) : ""
     );
-    setScore("");
+    setGrade("");
   }
 
   function selectGroup(next: ActivityGroupKey) {
     setGroupKey(next);
     setSubActivity("");
-    setScore("");
+    setGrade("");
   }
 
   function selectSubActivity(next: SubActivity) {
     setSubActivity(next);
-    setScore("");
+    setGrade("");
   }
 
   async function handleAiParse() {
@@ -206,7 +218,12 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
       setFamily(extracted.family as ActivityFamily);
       setGroupKey(loc.groupKey);
       setSubActivity(extracted.subActivity as SubActivity);
-      setScore(String(extracted.score ?? ""));
+      const aiDefaults = getFamilyEvaluationDefaults(
+        extracted.family as ActivityFamily
+      );
+      const aiIacMax = extracted.iacMax ?? aiDefaults.iacMax;
+      const aiScore = Number(extracted.score ?? 0);
+      setGrade(scoreToQualitativeGrade(aiScore, aiIacMax));
       setNotes(extracted.notes ?? notes);
     } catch (e) {
       setError(e instanceof Error ? e.message : t("saveError"));
@@ -223,7 +240,7 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
       setError(t("selectStudentError"));
       return;
     }
-    if (!family || !groupKey || !subActivity || !familyDefaults || !scoreValid) {
+    if (!family || !groupKey || !subActivity || !familyDefaults || !gradeValid) {
       setError(t("scoreError"));
       return;
     }
@@ -424,18 +441,24 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="score">{tEval("score")}</Label>
-            <Input
-              id="score"
-              type="number"
-              min={0}
-              max={iacMax}
-              step={0.1}
-              value={score}
-              onChange={(e) => setScore(e.target.value)}
+            <Label htmlFor="grade">{tEval("score")}</Label>
+            <Select
+              value={grade}
+              onValueChange={(value) => setGrade(value as QualitativeGrade)}
               required
-            />
-            {score && (
+            >
+              <SelectTrigger id="grade">
+                <SelectValue placeholder={tEval("selectGrade")} />
+              </SelectTrigger>
+              <SelectContent>
+                {QUALITATIVE_GRADES.map((level) => (
+                  <SelectItem key={level} value={level}>
+                    {tEval(`gradeLevels.${level}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {grade && (
               <div className="space-y-1">
                 <div
                   className="h-2 overflow-hidden rounded-full bg-muted"
@@ -444,24 +467,18 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
                   <div
                     className={cn(
                       "h-full rounded-full transition-all",
-                      scorePercent >= 70
-                        ? "bg-green-500"
-                        : scorePercent >= 50
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
+                      qualitativeGradeBarClass(grade)
                     )}
-                    style={{ width: `${Math.min(scorePercent, 100)}%` }}
+                    style={{ width: `${gradePercent}%` }}
                   />
                 </div>
                 <p
                   className={cn(
                     "text-xs font-medium",
-                    scoreColorClass(scorePercent)
+                    qualitativeGradeColorClass(grade)
                   )}
                 >
-                  {tEval("scoreOutOf", { score: scoreNum, max: iacMax })} —{" "}
-                  {scorePercent}%
-                  {scoreValid ? "" : ` (${t("invalidScore")})`}
+                  {tEval(`gradeLevels.${grade}`)}
                 </p>
               </div>
             )}
@@ -522,7 +539,7 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
       <div className="flex gap-2">
         <Button
           type="submit"
-          disabled={isPending || !scoreValid}
+          disabled={isPending || !gradeValid}
           className="rounded-full"
         >
           {isPending

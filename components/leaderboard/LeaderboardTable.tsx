@@ -1,6 +1,10 @@
 "use client";
 
-import { useTranslations, useFormatter } from "next-intl";
+import { useTranslations } from "next-intl";
+import {
+  QualitativeGradeDisplay,
+  QualitativeGradeLabel,
+} from "@/components/QualitativeGradeDisplay";
 import { FAMILY_ICONS } from "@/lib/activity-config";
 import type { ActivityFamily } from "@prisma/client";
 import { emptyFamilyScores, type LeaderboardEntry } from "@/types";
@@ -10,12 +14,6 @@ const FAMILIES: ActivityFamily[] = [
   "SPORTS_COLLECTIFS",
   "GYMNASTIQUE",
 ];
-
-function scoreClass(mark: number) {
-  if (mark >= 14) return "high";
-  if (mark >= 10) return "medium";
-  return "low";
-}
 
 function TrendCell({ trend }: { trend: "up" | "down" | "stable" }) {
   const t = useTranslations("leaderboard");
@@ -32,7 +30,6 @@ function TrendCell({ trend }: { trend: "up" | "down" | "stable" }) {
 export function LeaderboardTable({ students }: { students: LeaderboardEntry[] }) {
   const t = useTranslations("leaderboard");
   const tAct = useTranslations("activities");
-  const format = useFormatter();
 
   const medal = (rank: number) =>
     rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
@@ -92,41 +89,17 @@ export function LeaderboardTable({ students }: { students: LeaderboardEntry[] })
                 const scores = student.familyScores ?? emptyFamilyScores();
                 const mark = scores[family];
                 return (
-                  <td key={family} className="text-center tabular-nums">
-                    {mark > 0
-                      ? format.number(mark, {
-                          minimumFractionDigits: 1,
-                          maximumFractionDigits: 1,
-                        })
-                      : "—"}
+                  <td key={family} className="text-center">
+                    {mark > 0 ? (
+                      <QualitativeGradeLabel markOutOf20={mark} />
+                    ) : (
+                      "—"
+                    )}
                   </td>
                 );
               })}
               <td>
-                <div className="score-bar">
-                  <div className="score-bar-track" role="presentation">
-                    <span
-                      className={`score-bar-fill ${scoreClass(student.avgScore)}`}
-                      style={{
-                        width: `${Math.min(Math.max((student.avgScore / 20) * 100, 0), 100)}%`,
-                      }}
-                      title={t("scoreValue", {
-                        score: format.number(student.avgScore, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }),
-                      })}
-                    />
-                  </div>
-                  <strong className="min-w-[3.5rem] shrink-0 text-right tabular-nums">
-                    {t("scoreValue", {
-                      score: format.number(student.avgScore, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }),
-                    })}
-                  </strong>
-                </div>
+                <QualitativeGradeDisplay markOutOf20={student.avgScore} />
               </td>
               <td>
                 <TrendCell trend={student.trend} />

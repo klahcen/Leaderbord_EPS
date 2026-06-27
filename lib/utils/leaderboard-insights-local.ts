@@ -1,4 +1,5 @@
 import type { LeaderboardCategory } from "@/lib/constants/leaderboard-categories";
+import { markOutOf20ToGradeLabel } from "@/lib/utils/qualitative-grades";
 import type { LeaderboardEntry } from "@/types";
 
 export function getLocalLeaderboardInsights(
@@ -37,9 +38,9 @@ export function getLocalLeaderboardInsights(
 
   const templates: Record<string, (scope: string) => string> = {
     fr: (scope) => {
-      let text = `Excellente semaine en ${scope} ! ${leader.name} mène le classement avec ${leader.avgScore}/20.`;
+      let text = `Excellente semaine en ${scope} ! ${leader.name} mène le classement avec une note « ${markOutOf20ToGradeLabel(leader.avgScore, "fr")} ».`;
       if (top3[1]) {
-        text += ` ${top3[1].name} (${top3[1].avgScore}/20) et ${top3[2]?.name ?? "l'équipe"} restent très proches.`;
+        text += ` ${top3[1].name} (${markOutOf20ToGradeLabel(top3[1].avgScore, "fr")}) et ${top3[2]?.name ?? "l'équipe"} restent très proches.`;
       }
       if (improved.length > 0) {
         text += ` Félicitations à ${improved.map((s) => s.name).join(" et ")} pour leur progression.`;
@@ -47,9 +48,9 @@ export function getLocalLeaderboardInsights(
       return text;
     },
     ar: (scope) => {
-      let text = `أسبوع رائع في ${scope}! يتصدر ${leader.name} الترتيب بـ ${leader.avgScore}/20.`;
+      let text = `أسبوع رائع في ${scope}! يتصدر ${leader.name} الترتيب بتقييم «${markOutOf20ToGradeLabel(leader.avgScore, "ar")}».`;
       if (top3[1]) {
-        text += ` ${top3[1].name} (${top3[1].avgScore}/20) و${top3[2]?.name ?? "الفريق"} يحافظون على مستوى ممتاز.`;
+        text += ` ${top3[1].name} (${markOutOf20ToGradeLabel(top3[1].avgScore, "ar")}) و${top3[2]?.name ?? "الفريق"} يحافظون على مستوى ممتاز.`;
       }
       if (improved.length > 0) {
         text += ` تهانينا لـ ${improved.map((s) => s.name).join(" و")} على تقدمهم.`;
@@ -57,9 +58,9 @@ export function getLocalLeaderboardInsights(
       return text;
     },
     en: (scope) => {
-      let text = `Great week in ${scope}! ${leader.name} leads the board at ${leader.avgScore}/20.`;
+      let text = `Great week in ${scope}! ${leader.name} leads the board with a « ${markOutOf20ToGradeLabel(leader.avgScore, "en")} » rating.`;
       if (top3[1]) {
-        text += ` ${top3[1].name} (${top3[1].avgScore}/20) and ${top3[2]?.name ?? "the team"} keep the podium competitive.`;
+        text += ` ${top3[1].name} (${markOutOf20ToGradeLabel(top3[1].avgScore, "en")}) and ${top3[2]?.name ?? "the team"} keep the podium competitive.`;
       }
       if (improved.length > 0) {
         text += ` Shout-out to ${improved.map((s) => s.name).join(" and ")} for trending up.`;
