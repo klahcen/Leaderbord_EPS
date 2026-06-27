@@ -5,15 +5,7 @@ import {
   QualitativeGradeDisplay,
   QualitativeGradeLabel,
 } from "@/components/QualitativeGradeDisplay";
-import { FAMILY_ICONS } from "@/lib/activity-config";
-import type { ActivityFamily } from "@prisma/client";
-import { emptyFamilyScores, type LeaderboardEntry } from "@/types";
-
-const FAMILIES: ActivityFamily[] = [
-  "ATHLETISME",
-  "SPORTS_COLLECTIFS",
-  "GYMNASTIQUE",
-];
+import type { LeaderboardEntry } from "@/types";
 
 function TrendCell({ trend }: { trend: "up" | "down" | "stable" }) {
   const t = useTranslations("leaderboard");
@@ -29,85 +21,76 @@ function TrendCell({ trend }: { trend: "up" | "down" | "stable" }) {
 
 export function LeaderboardTable({ students }: { students: LeaderboardEntry[] }) {
   const t = useTranslations("leaderboard");
-  const tAct = useTranslations("activities");
 
   const medal = (rank: number) =>
     rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
 
   return (
-    <section className="mb-8 hidden overflow-x-auto md:block">
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>{t("rank")}</th>
-            <th>{t("student")}</th>
-            <th>{t("class")}</th>
-            {FAMILIES.map((family) => (
-              <th key={family} className="text-center whitespace-nowrap">
-                <span title={tAct(family)}>
-                  {FAMILY_ICONS[family]}{" "}
-                  <span className="hidden lg:inline">
-                    {t(`familyShort.${family}`)}
-                  </span>
-                </span>
-              </th>
-            ))}
-            <th>{t("score")}</th>
-            <th>{t("trend")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {students.map((student) => (
-            <tr key={student.id}>
-              <td>
-                <strong>{medal(student.rank) ?? `#${student.rank}`}</strong>
-              </td>
-              <td>
-                <span className="flex items-center gap-3">
-                  <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold"
-                    aria-hidden
-                  >
-                    {student.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .slice(0, 2)}
-                  </span>
-                  <span>
-                    <span className="block font-semibold">{student.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {student.studentCode}
+    <section className="leaderboard-table-section mb-8 hidden lg:block">
+      <div className="leaderboard-table-wrap">
+        <table className="data-table leaderboard-table">
+          <thead>
+            <tr>
+              <th className="col-rank">{t("rank")}</th>
+              <th className="col-student">{t("student")}</th>
+              <th className="col-class">{t("class")}</th>
+              <th className="col-eps">{t("eps")}</th>
+              <th className="col-note">{t("score")}</th>
+              <th className="col-trend">{t("trend")}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.map((student) => (
+              <tr key={student.id}>
+                <td className="col-rank">
+                  <strong>{medal(student.rank) ?? `#${student.rank}`}</strong>
+                </td>
+                <td className="col-student">
+                  <span className="leaderboard-student-cell">
+                    <span
+                      className="leaderboard-student-avatar"
+                      aria-hidden
+                    >
+                      {student.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2)}
+                    </span>
+                    <span className="leaderboard-student-info min-w-0">
+                      <span className="leaderboard-student-name">
+                        {student.name}
+                      </span>
+                      <span className="leaderboard-student-code">
+                        {student.studentCode}
+                      </span>
                     </span>
                   </span>
-                </span>
-              </td>
-              <td>
-                <span className="badge-neutral">{student.className}</span>
-              </td>
-              {FAMILIES.map((family) => {
-                const scores = student.familyScores ?? emptyFamilyScores();
-                const mark = scores[family];
-                return (
-                  <td key={family} className="text-center">
-                    {mark > 0 ? (
-                      <QualitativeGradeLabel markOutOf20={mark} />
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                );
-              })}
-              <td className="w-[7.5rem] max-w-[7.5rem]">
-                <QualitativeGradeDisplay markOutOf20={student.avgScore} compact />
-              </td>
-              <td>
-                <TrendCell trend={student.trend} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+                <td className="col-class">
+                  <span className="badge-neutral leaderboard-class-badge">
+                    {student.className}
+                  </span>
+                </td>
+                <td className="col-eps">
+                  <QualitativeGradeLabel markOutOf20={student.avgScore} />
+                </td>
+                <td className="col-note">
+                  <QualitativeGradeDisplay
+                    markOutOf20={student.avgScore}
+                    compact
+                  />
+                </td>
+                <td className="col-trend">
+                  <TrendCell trend={student.trend} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
+
+export { TrendCell };

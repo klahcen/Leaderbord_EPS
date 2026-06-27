@@ -217,6 +217,7 @@
     "rank": "الترتيب",
     "student": "الطالب",
     "class": "الصف",
+    "eps": "EPS",
     "score": "الدرجة / 20",
     "scoreValue": "{score}/20",
     "trend": "الاتجاه",

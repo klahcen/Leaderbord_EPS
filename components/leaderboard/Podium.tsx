@@ -40,8 +40,8 @@ export function Podium({ top3 }: { top3: LeaderboardEntry[] }) {
             className={`podium-item ${slot.rankClass} ${slot.order}`}
           >
             <span className={`podium-avatar ${slot.rankClass}`}>{initials}</span>
-            <p className="text-center text-sm font-bold">{student.name}</p>
-            <p className="text-xs text-muted-foreground">{student.className}</p>
+            <p className="podium-name">{student.name}</p>
+            <p className="podium-class">{student.className}</p>
             <QualitativeGradeDisplay
               markOutOf20={student.avgScore}
               showBar={false}

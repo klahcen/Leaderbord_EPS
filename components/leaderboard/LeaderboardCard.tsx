@@ -1,52 +1,60 @@
 "use client";
 
-import { QualitativeGradeDisplay } from "@/components/QualitativeGradeDisplay";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import {
+  QualitativeGradeDisplay,
+  QualitativeGradeLabel,
+} from "@/components/QualitativeGradeDisplay";
+import { TrendCell } from "@/components/leaderboard/LeaderboardTable";
 import type { LeaderboardEntry } from "@/types";
 
+function rankLabel(rank: number) {
+  if (rank === 1) return "🥇";
+  if (rank === 2) return "🥈";
+  if (rank === 3) return "🥉";
+  return `#${rank}`;
+}
+
 export function LeaderboardCardList({ students }: { students: LeaderboardEntry[] }) {
+  const t = useTranslations("leaderboard");
 
   return (
-    <div className="space-y-3 md:hidden">
+    <div className="leaderboard-cards space-y-3 lg:hidden">
       {students.map((student) => (
-        <div
-          key={student.id}
-          className="flex items-center gap-4 rounded-lg border bg-card p-4"
-        >
-          <span className="text-xl font-bold text-muted-foreground">
-            #{student.rank}
-          </span>
-          <Avatar>
-            <AvatarFallback>
+        <article key={student.id} className="leaderboard-card">
+          <div className="leaderboard-card-header">
+            <span className="leaderboard-card-rank">{rankLabel(student.rank)}</span>
+            <span className="leaderboard-student-avatar" aria-hidden>
               {student.name
                 .split(" ")
                 .map((n) => n[0])
                 .join("")
                 .slice(0, 2)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <p className="font-medium">{student.name}</p>
-            <p className="text-xs text-muted-foreground">{student.className}</p>
-            <div className="mt-2">
-              <QualitativeGradeDisplay markOutOf20={student.avgScore} />
+            </span>
+            <div className="leaderboard-card-identity min-w-0">
+              <p className="leaderboard-student-name">{student.name}</p>
+              <p className="leaderboard-student-code">{student.studentCode}</p>
+            </div>
+            <span className="badge-neutral leaderboard-class-badge shrink-0">
+              {student.className}
+            </span>
+          </div>
+
+          <div className="leaderboard-card-metrics">
+            <div className="leaderboard-card-metric">
+              <span className="leaderboard-card-metric-label">{t("eps")}</span>
+              <QualitativeGradeLabel markOutOf20={student.avgScore} />
+            </div>
+            <div className="leaderboard-card-metric leaderboard-card-metric--note">
+              <span className="leaderboard-card-metric-label">{t("score")}</span>
+              <QualitativeGradeDisplay markOutOf20={student.avgScore} compact />
+            </div>
+            <div className="leaderboard-card-metric leaderboard-card-metric--trend">
+              <span className="leaderboard-card-metric-label">{t("trend")}</span>
+              <TrendCell trend={student.trend} />
             </div>
           </div>
-          <div className="text-right">
-            <div className="mt-1 flex justify-end">
-              {student.trend === "up" && (
-                <TrendingUp className="h-4 w-4 text-green-600" />
-              )}
-              {student.trend === "down" && (
-                <TrendingDown className="h-4 w-4 text-red-600" />
-              )}
-              {student.trend === "stable" && (
-                <Minus className="h-4 w-4 text-gray-400" />
-              )}
-            </div>
-          </div>
-        </div>
+        </article>
       ))}
     </div>
   );

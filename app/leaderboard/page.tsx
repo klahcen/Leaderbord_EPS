@@ -35,11 +35,14 @@ export default async function LeaderboardPage({
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/leaderboard" className="sidebar-logo !p-0 text-base md:text-lg">
+        <div className="mx-auto flex max-w-5xl min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
+          <Link
+            href="/leaderboard"
+            className="sidebar-logo shrink-0 !p-0 text-base md:text-lg"
+          >
             PE <span>Sport</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
             <Button variant="outline" size="sm" asChild>
@@ -49,7 +52,7 @@ export default async function LeaderboardPage({
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-8">
+      <div className="mx-auto min-w-0 max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
         <LeaderboardHero />
         <Suspense fallback={<div className="h-96 animate-pulse rounded-xl bg-muted" />}>
           <LeaderboardClient

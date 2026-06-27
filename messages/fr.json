@@ -217,6 +217,7 @@
     "rank": "Rang",
     "student": "Élève",
     "class": "Classe",
+    "eps": "EPS",
     "score": "Note",
     "scoreValue": "{score}/20",
     "trend": "Tendance",
