@@ -3,7 +3,7 @@ import type { ActivityFamily, SubActivity } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import {
   generateStructuredJson,
-  GEMINI_MODELS,
+  formatGeminiError,
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
@@ -47,7 +47,6 @@ export async function POST(req: NextRequest) {
   let extracted: ExtractedProgress;
   try {
     extracted = await generateStructuredJson<ExtractedProgress>({
-      model: GEMINI_MODELS.FLASH,
       schema: extractProgressSchema,
       prompt: `Extract a Moroccan PE procedural activity entry from this description. ${languageInstruction}
 
@@ -59,8 +58,10 @@ Return JSON with family, subActivity, score (0-14), notes, and confidence.
 subActivity must belong to the chosen family.`,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gemini API error";
-    return NextResponse.json({ error: msg }, { status: 502 });
+    return NextResponse.json(
+      { error: formatGeminiError(err, locale) },
+      { status: 502 }
+    );
   }
 
   if (!extracted?.subActivity || !extracted?.family) {

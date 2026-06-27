@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import {
   generateText,
-  GEMINI_MODELS,
+  formatGeminiError,
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
@@ -50,7 +50,6 @@ export async function POST(req: NextRequest) {
 
   try {
     const analysis = await generateText({
-      model: GEMINI_MODELS.FLASH,
       maxOutputTokens: 1024,
       prompt: `You are an expert Physical Education coach and sports analyst. ${languageInstruction}
 
@@ -72,7 +71,9 @@ Be specific and data-driven. Reference actual scores in your analysis. Keep it c
 
     return NextResponse.json({ analysis });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gemini API error";
-    return NextResponse.json({ error: msg }, { status: 502 });
+    return NextResponse.json(
+      { error: formatGeminiError(err, locale) },
+      { status: 502 }
+    );
   }
 }

@@ -10,7 +10,6 @@ import { StudentProgressFilter } from "@/components/dashboard/StudentProgressFil
 import { AIAnalysisButton } from "@/components/dashboard/AIAnalysisButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { KnowledgeDomain } from "@prisma/client";
 
 interface PageProps {
@@ -26,7 +25,6 @@ export default async function StudentDetailPage({
   const { category } = await searchParams;
   const t = await getTranslations("students");
   const tEval = await getTranslations("evaluation");
-  const tAct = await getTranslations("activities");
   const format = await getFormatter();
   const domainFilter = parseLeaderboardCategory(category);
 
@@ -114,7 +112,7 @@ export default async function StudentDetailPage({
         <StudentProgressFilter studentId={student.id} active={domainFilter} />
       </div>
 
-      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+      <div className="mb-8">
         <Card>
           <CardHeader>
             <CardTitle>{t("progressOverTime")}</CardTitle>
@@ -127,55 +125,6 @@ export default async function StudentDetailPage({
                 {t("noProgressYet")}
               </p>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("progressHistory")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="max-h-80 overflow-y-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="py-2 text-left">{t("date")}</th>
-                    <th className="py-2 text-left">{tEval("activity")}</th>
-                    <th className="py-2 text-left">{tEval("score")}</th>
-                    <th className="py-2 text-left"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {student.progressLogs.map((log) => (
-                    <tr key={log.id} className="border-b">
-                      <td className="py-2 text-muted-foreground">
-                        {format.dateTime(new Date(log.recordedAt), {
-                          dateStyle: "medium",
-                        })}
-                      </td>
-                      <td className="py-2">
-                        <Badge variant="outline">
-                          {tAct(log.subActivity)}
-                        </Badge>
-                      </td>
-                      <td className="py-2 font-medium">
-                        {tEval("scoreOutOf", {
-                          score: log.score,
-                          max: log.iacMax,
-                        })}
-                      </td>
-                      <td className="py-2 text-right">
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/dashboard/progress/${log.id}`}>
-                            {t("edit")}
-                          </Link>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </CardContent>
         </Card>
       </div>

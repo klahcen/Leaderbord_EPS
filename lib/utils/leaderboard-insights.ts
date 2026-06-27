@@ -1,6 +1,5 @@
 import {
   generateText,
-  GEMINI_MODELS,
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
@@ -20,7 +19,6 @@ export async function generateLeaderboardInsights(
 
   try {
     return await generateText({
-      model: GEMINI_MODELS.FLASH,
       maxOutputTokens: 300,
       prompt: `You are a PE coach celebrating student achievements. ${languageInstruction}
 

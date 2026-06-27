@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import {
   generateChatReply,
-  GEMINI_MODELS,
+  formatGeminiError,
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
@@ -82,7 +82,6 @@ Be concise, helpful, and professional. If asked for a list, use bullet points. U
 
   try {
     const reply = await generateChatReply({
-      model: GEMINI_MODELS.FLASH,
       system: systemPrompt,
       history,
       message: question,
@@ -91,7 +90,9 @@ Be concise, helpful, and professional. If asked for a list, use bullet points. U
 
     return NextResponse.json({ reply });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Gemini API error";
-    return NextResponse.json({ error: msg }, { status: 502 });
+    return NextResponse.json(
+      { error: formatGeminiError(err, locale) },
+      { status: 502 }
+    );
   }
 }

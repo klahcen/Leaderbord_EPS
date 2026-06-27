@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import {
   streamText,
-  GEMINI_MODELS,
+  formatGeminiError,
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
@@ -67,7 +67,6 @@ Format using markdown headers and bullet points.`;
     async start(controller) {
       try {
         for await (const text of streamText({
-          model: GEMINI_MODELS.FLASH,
           prompt,
           maxOutputTokens: 1500,
         })) {
@@ -76,7 +75,7 @@ Format using markdown headers and bullet points.`;
       } catch (err) {
         controller.enqueue(
           new TextEncoder().encode(
-            `\n\nError: ${err instanceof Error ? err.message : "Stream failed"}`
+            `\n\n${formatGeminiError(err, locale)}`
           )
         );
       } finally {
