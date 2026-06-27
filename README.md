@@ -172,17 +172,27 @@ make docker-run     # Lancer le conteneur en local
 
 Le projet inclut un `Dockerfile` et un `railway.toml` pour le déploiement sur Railway.
 
-**Variables Railway requises :**
+**Important — variables sur le service WEB (Leaderbord_EPS), pas seulement Postgres :**
 
 ```
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 AUTH_SECRET=<openssl rand -base64 32>
-AUTH_URL=https://your-app.up.railway.app
+AUTH_URL=https://leaderbord.up.railway.app
 ANTHROPIC_API_KEY=<optionnel>
 ```
 
-**Build :** `npm run build`  
-**Démarrage :** `npm run railway:start` (exécute `prisma db push` puis sert l'application)
+**Seed automatique au déploiement :** le conteneur exécute `prisma db push` + `prisma db seed` (32 élèves) au démarrage. Si le seed échoue, `/api/health` le relance tant que la base est vide.
+
+Après deploy, vérifiez : `https://votre-app.up.railway.app/api/health` → doit retourner `{"ok":true,"students":32,...}`
+
+Pour désactiver le seed : `RUN_DB_SEED=false`
+
+**Seed manuel depuis votre PC** (optionnel) — ajoutez l'URL Railway dans `.env` :
+
+```bash
+RAILWAY_DATABASE_URL="postgresql://postgres:...@....proxy.rlwy.net:12345/railway"
+make db-seed-railway
+```
 
 Point de contrôle de santé : `/api/health`
 

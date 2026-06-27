@@ -63,14 +63,41 @@ db-seed: ## Seed demo data
 db-setup: db-up db-push db-seed ## Start DB + schema + seed (first-time local setup)
 
 # Railway Postgres → Connect → Public URL (host + port change when service restarts)
-# Example: make db-push-railway RAILWAY_DATABASE_URL='postgresql://postgres:PASS@yamanote.proxy.rlwy.net:21612/railway'
-db-push-railway: ## Push schema to Railway DB (set RAILWAY_DATABASE_URL)
-	@test -n "$(RAILWAY_DATABASE_URL)" || (echo "Set RAILWAY_DATABASE_URL first" && exit 1)
-	DATABASE_URL="$(RAILWAY_DATABASE_URL)" npx prisma db push
+# Add to .env: RAILWAY_DATABASE_URL="postgresql://postgres:PASS@yamanote.proxy.rlwy.net:21612/railway"
+# Or pass on CLI: make db-seed-railway RAILWAY_DATABASE_URL='postgresql://...'
 
-db-seed-railway: ## Seed Railway DB (set RAILWAY_DATABASE_URL)
-	@test -n "$(RAILWAY_DATABASE_URL)" || (echo "Set RAILWAY_DATABASE_URL first" && exit 1)
-	DATABASE_URL="$(RAILWAY_DATABASE_URL)" npx prisma db seed
+railway-db-url = $(if $(RAILWAY_DATABASE_URL),$(RAILWAY_DATABASE_URL),$(shell grep -E '^RAILWAY_DATABASE_URL=' .env 2>/dev/null | sed 's/^RAILWAY_DATABASE_URL=//' | tr -d '"'))
+
+define check-railway-url
+	@if [ -z "$(railway-db-url)" ]; then \
+		echo "ERROR: RAILWAY_DATABASE_URL is not set."; \
+		echo "  1. Railway → Postgres → Connect → Public Network"; \
+		echo "  2. Copy the full URL (real host + numeric port, not PORT)"; \
+		echo "  3. Add to .env: RAILWAY_DATABASE_URL=\"postgresql://...\""; \
+		echo "     or: make db-seed-railway RAILWAY_DATABASE_URL='postgresql://...'"; \
+		exit 1; \
+	fi
+	@case "$(railway-db-url)" in \
+		*:PORT*|*@....*|*PASSWORD*|*YOUR_PASSWORD*|*TON_MOT_DE_PASSE*|*@HOST:*|*@host:*) \
+		echo "ERROR: This is still the example URL — not your real Railway connection."; \
+		echo ""; \
+		echo "  Railway dashboard → your Postgres service → Connect tab"; \
+		echo "  → enable Public Network → copy 'Connection URL' (or DATABASE_URL)"; \
+		echo "  → paste the FULL string into .env as RAILWAY_DATABASE_URL"; \
+		echo ""; \
+		echo "  Real URLs look like:"; \
+		echo "  postgresql://postgres:abc123@monorail.proxy.rlwy.net:48291/railway"; \
+		exit 1;; \
+	esac
+endef
+
+db-push-railway: ## Push schema to Railway DB (set RAILWAY_DATABASE_URL in .env or CLI)
+	$(check-railway-url)
+	DATABASE_URL="$(railway-db-url)" npx prisma db push
+
+db-seed-railway: ## Seed Railway DB (set RAILWAY_DATABASE_URL in .env or CLI)
+	$(check-railway-url)
+	DATABASE_URL="$(railway-db-url)" npx prisma db seed
 
 db-studio: ## Open Prisma Studio
 	npx prisma studio
