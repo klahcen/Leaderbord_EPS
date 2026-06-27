@@ -12,6 +12,7 @@ import {
 type QualitativeGradeDisplayProps = {
   markOutOf20: number;
   showBar?: boolean;
+  compact?: boolean;
   labelClassName?: string;
 };
 
@@ -43,6 +44,7 @@ export function QualitativeGradeLabel({
 export function QualitativeGradeDisplay({
   markOutOf20,
   showBar = true,
+  compact = false,
   labelClassName,
 }: QualitativeGradeDisplayProps) {
   const tEval = useTranslations("evaluation");
@@ -53,15 +55,24 @@ export function QualitativeGradeDisplay({
 
   if (!showBar) {
     return (
-      <span className={cn("font-semibold", qualitativeGradeColorClass(grade), labelClassName)}>
+      <span
+        className={cn(
+          compact ? "text-xs font-semibold" : "font-semibold",
+          qualitativeGradeColorClass(grade),
+          labelClassName
+        )}
+      >
         {label}
       </span>
     );
   }
 
   return (
-    <div className="score-bar">
-      <div className="score-bar-track" role="presentation">
+    <div className={cn("score-bar", compact && "score-bar--compact gap-1.5")}>
+      <div
+        className={cn("score-bar-track", compact && "score-bar-track--compact")}
+        role="presentation"
+      >
         <span
           className={`score-bar-fill ${scoreClass}`}
           style={{ width: `${percent}%` }}
@@ -70,7 +81,8 @@ export function QualitativeGradeDisplay({
       </div>
       <strong
         className={cn(
-          "min-w-[5.5rem] shrink-0 text-right",
+          "shrink-0 text-right",
+          compact ? "min-w-[3.25rem] text-[10px] font-semibold leading-tight" : "min-w-[5.5rem]",
           qualitativeGradeColorClass(grade),
           labelClassName
         )}

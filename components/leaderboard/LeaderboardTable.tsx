@@ -98,8 +98,8 @@ export function LeaderboardTable({ students }: { students: LeaderboardEntry[] })
                   </td>
                 );
               })}
-              <td>
-                <QualitativeGradeDisplay markOutOf20={student.avgScore} />
+              <td className="w-[7.5rem] max-w-[7.5rem]">
+                <QualitativeGradeDisplay markOutOf20={student.avgScore} compact />
               </td>
               <td>
                 <TrendCell trend={student.trend} />

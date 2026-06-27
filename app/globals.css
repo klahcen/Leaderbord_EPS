@@ -522,6 +522,17 @@
   max-width: 10rem;
 }
 
+.score-bar--compact {
+  max-width: 7.5rem;
+}
+
+.score-bar-track--compact {
+  height: 6px;
+  min-width: 2.75rem;
+  max-width: 3.5rem;
+  flex: 0 1 auto;
+}
+
 .score-bar-fill {
   display: block;
   height: 100%;
