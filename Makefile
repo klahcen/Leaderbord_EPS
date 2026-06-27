@@ -110,7 +110,7 @@ railway-start: ## Railway start: sync DB schema then serve
 env-check: ## Print which required env vars are set (values hidden)
 	@echo "DATABASE_URL:        $$([ -n \"$$DATABASE_URL\" ] && echo set || echo MISSING)"
 	@echo "AUTH_SECRET:         $$([ -n \"$$AUTH_SECRET\" ] && echo set || echo MISSING)"
-	@echo "ANTHROPIC_API_KEY:   $$([ -n \"$$ANTHROPIC_API_KEY\" ] && echo set || echo MISSING)"
+	@echo "GEMINI_API_KEY:      $$([ -n \"$$GEMINI_API_KEY\" ] && echo set || echo MISSING)"
 	@echo "AUTH_URL (optional): $$([ -n \"$$AUTH_URL\" ] && echo set || echo not set)"
 
 docker-build: ## Build Docker image locally

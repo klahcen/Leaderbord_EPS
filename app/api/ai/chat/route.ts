@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { claude, CLAUDE_MODELS, isClaudeConfigured } from "@/lib/claude";
+import {
+  generateChatReply,
+  GEMINI_MODELS,
+  isGeminiConfigured,
+} from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
 import { prisma } from "@/lib/prisma";
 
@@ -13,9 +17,9 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!isClaudeConfigured()) {
+  if (!isGeminiConfigured()) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured" },
+      { error: "GEMINI_API_KEY is not configured" },
       { status: 503 }
     );
   }
@@ -76,21 +80,18 @@ Be concise, helpful, and professional. If asked for a list, use bullet points. U
 
   const history: ChatMessage[] = Array.isArray(messages) ? messages : [];
 
-  const response = await claude.messages.create({
-    model: CLAUDE_MODELS.SONNET,
-    max_tokens: 800,
-    system: systemPrompt,
-    messages: [
-      ...history.map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      })),
-      { role: "user", content: question },
-    ],
-  });
+  try {
+    const reply = await generateChatReply({
+      model: GEMINI_MODELS.FLASH,
+      system: systemPrompt,
+      history,
+      message: question,
+      maxOutputTokens: 800,
+    });
 
-  const reply =
-    response.content[0].type === "text" ? response.content[0].text : "";
-
-  return NextResponse.json({ reply });
+    return NextResponse.json({ reply });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Gemini API error";
+    return NextResponse.json({ error: msg }, { status: 502 });
+  }
 }

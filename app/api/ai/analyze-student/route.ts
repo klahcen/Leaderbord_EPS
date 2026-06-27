@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { claude, CLAUDE_MODELS, isClaudeConfigured } from "@/lib/claude";
+import {
+  generateText,
+  GEMINI_MODELS,
+  isGeminiConfigured,
+} from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
 import { prisma } from "@/lib/prisma";
 
@@ -8,9 +12,9 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!isClaudeConfigured()) {
+  if (!isGeminiConfigured()) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured" },
+      { error: "GEMINI_API_KEY is not configured" },
       { status: 503 }
     );
   }
@@ -44,13 +48,11 @@ export async function POST(req: NextRequest) {
 
   const languageInstruction = getLanguageInstruction(locale);
 
-  const message = await claude.messages.create({
-    model: CLAUDE_MODELS.SONNET,
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: `You are an expert Physical Education coach and sports analyst. ${languageInstruction}
+  try {
+    const analysis = await generateText({
+      model: GEMINI_MODELS.FLASH,
+      maxOutputTokens: 1024,
+      prompt: `You are an expert Physical Education coach and sports analyst. ${languageInstruction}
 
 Here is the progress data for student **${student.name}** (Class: ${student.schoolClass?.name ?? "No class"}, Code: ${student.studentCode}):
 
@@ -65,13 +67,12 @@ Please provide:
 4. **Personalized Training Plan** — 3 specific weekly recommendations to help this student improve
 5. **Motivational Note** — a short encouraging message for the student
 
-Be specific and data-driven. Reference actual scores in your analysis. Keep it concise (under 400 words). Use markdown formatting.`,
-      },
-    ],
-  });
+Be specific and data-driven. Reference actual scores in your analysis. Keep it concise (under 400 words). Use markdown when helpful.`,
+    });
 
-  const analysis =
-    message.content[0].type === "text" ? message.content[0].text : "";
-
-  return NextResponse.json({ analysis });
+    return NextResponse.json({ analysis });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Gemini API error";
+    return NextResponse.json({ error: msg }, { status: 502 });
+  }
 }

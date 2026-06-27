@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ActivityFamily, SubActivity } from "@prisma/client";
 import { auth } from "@/lib/auth";
-import { claude, CLAUDE_MODELS, isClaudeConfigured } from "@/lib/claude";
+import {
+  generateStructuredJson,
+  GEMINI_MODELS,
+  isGeminiConfigured,
+} from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
-import { extractProgressTool, type ExtractedProgress } from "@/lib/ai/tools";
+import {
+  extractProgressSchema,
+  type ExtractedProgress,
+} from "@/lib/ai/tools";
 import {
   getFamilyEvaluationDefaults,
   getFamilyForSubActivity,
@@ -23,9 +30,9 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!isClaudeConfigured()) {
+  if (!isGeminiConfigured()) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured" },
+      { error: "GEMINI_API_KEY is not configured" },
       { status: 503 }
     );
   }
@@ -37,33 +44,26 @@ export async function POST(req: NextRequest) {
 
   const languageInstruction = getLanguageInstruction(locale);
 
-  let message;
+  let extracted: ExtractedProgress;
   try {
-    message = await claude.messages.create({
-      model: CLAUDE_MODELS.SONNET,
-      max_tokens: 512,
-      tools: [extractProgressTool],
-      tool_choice: { type: "tool", name: "extract_progress_entry" },
-      messages: [
-        {
-          role: "user",
-          content: `Extract a Moroccan PE procedural activity entry from this description. ${languageInstruction}
+    extracted = await generateStructuredJson<ExtractedProgress>({
+      model: GEMINI_MODELS.FLASH,
+      schema: extractProgressSchema,
+      prompt: `Extract a Moroccan PE procedural activity entry from this description. ${languageInstruction}
 
 ${ACTIVITY_HINT}
 
 Description: "${description}"
 
-Use the extract_progress_entry tool. subActivity must belong to the chosen family. Score must be from 0 up to 14.`,
-        },
-      ],
+Return JSON with family, subActivity, score (0-14), notes, and confidence.
+subActivity must belong to the chosen family.`,
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : "Claude API error";
+    const msg = err instanceof Error ? err.message : "Gemini API error";
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 
-  const toolUse = message.content.find((b) => b.type === "tool_use");
-  if (!toolUse || toolUse.type !== "tool_use") {
+  if (!extracted?.subActivity || !extracted?.family) {
     return NextResponse.json(
       {
         error:
@@ -73,7 +73,6 @@ Use the extract_progress_entry tool. subActivity must belong to the chosen famil
     );
   }
 
-  const extracted = toolUse.input as ExtractedProgress;
   const subActivity = extracted.subActivity as SubActivity;
   const familyFromSub = getFamilyForSubActivity(subActivity);
   const family = (extracted.family as ActivityFamily) ?? familyFromSub;

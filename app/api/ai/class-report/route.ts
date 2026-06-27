@@ -1,5 +1,9 @@
 import { auth } from "@/lib/auth";
-import { claude, CLAUDE_MODELS, isClaudeConfigured } from "@/lib/claude";
+import {
+  streamText,
+  GEMINI_MODELS,
+  isGeminiConfigured,
+} from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
 import { prisma } from "@/lib/prisma";
 
@@ -7,8 +11,8 @@ export async function POST(req: Request) {
   const session = await auth();
   if (!session) return new Response("Unauthorized", { status: 401 });
 
-  if (!isClaudeConfigured()) {
-    return new Response("ANTHROPIC_API_KEY is not configured", { status: 503 });
+  if (!isGeminiConfigured()) {
+    return new Response("GEMINI_API_KEY is not configured", { status: 503 });
   }
 
   let locale = "en";
@@ -43,13 +47,7 @@ export async function POST(req: Request) {
 
   const languageInstruction = getLanguageInstruction(locale);
 
-  const stream = claude.messages.stream({
-    model: CLAUDE_MODELS.SONNET,
-    max_tokens: 1500,
-    messages: [
-      {
-        role: "user",
-        content: `You are a Physical Education department coordinator. ${languageInstruction}
+  const prompt = `You are a Physical Education department coordinator. ${languageInstruction}
 
 Here is this week's class progress data:
 
@@ -63,21 +61,17 @@ Generate a structured **Weekly Class Performance Report** with:
 5. **Recommended Focus for Next Week** — 2-3 class-wide training priorities
 6. **Action Items** — bullet list of concrete steps for the professor
 
-Format using markdown headers and bullet points.`,
-      },
-    ],
-  });
+Format using markdown headers and bullet points.`;
 
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of stream) {
-          if (
-            chunk.type === "content_block_delta" &&
-            chunk.delta.type === "text_delta"
-          ) {
-            controller.enqueue(new TextEncoder().encode(chunk.delta.text));
-          }
+        for await (const text of streamText({
+          model: GEMINI_MODELS.FLASH,
+          prompt,
+          maxOutputTokens: 1500,
+        })) {
+          controller.enqueue(new TextEncoder().encode(text));
         }
       } catch (err) {
         controller.enqueue(

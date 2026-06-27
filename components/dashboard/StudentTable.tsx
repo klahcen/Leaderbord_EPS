@@ -14,7 +14,6 @@ interface StudentRow {
   studentCode: string;
   className: string;
   avgScore: number;
-  lastActivity: Date | null;
 }
 
 export function StudentTable({
@@ -56,7 +55,6 @@ export function StudentTable({
               <th className="px-4 py-3 text-left font-medium">{t("code")}</th>
               <th className="px-4 py-3 text-left font-medium">{t("class")}</th>
               <th className="px-4 py-3 text-left font-medium">{t("avgScore")}</th>
-              <th className="px-4 py-3 text-left font-medium">{t("lastActivity")}</th>
               {showActions && (
                 <th className="px-4 py-3 text-right font-medium">{t("actions")}</th>
               )}
@@ -98,13 +96,6 @@ export function StudentTable({
                       /20
                     </span>
                   </div>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {student.lastActivity
-                    ? format.dateTime(new Date(student.lastActivity), {
-                        dateStyle: "medium",
-                      })
-                    : "—"}
                 </td>
                 {showActions && (
                   <td className="px-4 py-3">

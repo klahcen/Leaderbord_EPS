@@ -7,7 +7,7 @@ Application web pour les professeurs d'Éducation Physique et Sportive (EPS) au 
 - **Classement public** — Classements par domaine de connaissance (procédural, conceptuel, comportemental) avec podium et analyses IA en vedette
 - **Tableau de bord professeur** — Espace protégé pour gérer les élèves, les classes et les fiches de progression
 - **Notation EPS marocaine** — Familles d'activités (athlétisme, sports collectifs, gymnastique), sous-activités, critères d'évaluation et notation basée sur l'IAC
-- **Assistant IA** (optionnel) — Propulsé par Anthropic Claude :
+- **Assistant IA** (optionnel) — Propulsé par Google Gemini :
   - Saisie de progression en langage naturel
   - Analyse par élève
   - Rapports hebdomadaires de classe
@@ -25,7 +25,7 @@ Application web pour les professeurs d'Éducation Physique et Sportive (EPS) au 
 | Graphiques | [Recharts](https://recharts.org/) |
 | Authentification | [NextAuth.js v5](https://authjs.dev/) (identifiants email/mot de passe) |
 | Base de données | [PostgreSQL](https://www.postgresql.org/) + [Prisma ORM](https://www.prisma.io/) |
-| IA | [Anthropic Claude SDK](https://docs.anthropic.com/) (`claude-sonnet-4-6`, `claude-haiku-4-5`) |
+| IA | [Google Gemini API](https://ai.google.dev/) (`gemini-2.0-flash`) |
 | i18n | [next-intl](https://next-intl.dev/) |
 | Validation | [Zod](https://zod.dev/) |
 | Markdown | react-markdown (rendu des réponses IA) |
@@ -50,7 +50,7 @@ components/
 lib/
   actions/               # Server actions (élèves, classes, progression)
   utils/                 # Helpers scoring, classement, statistiques
-  ai/                    # Outils et prompts Claude
+  ai/                    # Outils et prompts Gemini
   constants/             # Catégories du classement
 prisma/
   schema.prisma          # Schéma de la base de données
@@ -63,7 +63,7 @@ messages/                # Chaînes i18n (en, fr, ar)
 - Node.js 20+
 - npm
 - Docker (optionnel, pour PostgreSQL en local)
-- Clé API Anthropic (optionnelle, pour les fonctionnalités IA)
+- Clé API Gemini (optionnelle, pour les fonctionnalités IA)
 
 ## Démarrage
 
@@ -88,7 +88,7 @@ cp .env.example .env
 | `DATABASE_URL` | Oui | Chaîne de connexion PostgreSQL |
 | `AUTH_SECRET` | Oui | Secret de session (`openssl rand -base64 32`) |
 | `NEXTAUTH_SECRET` | Oui | Identique à `AUTH_SECRET` pour NextAuth |
-| `ANTHROPIC_API_KEY` | Non | Active les fonctionnalités IA |
+| `GEMINI_API_KEY` | Non | Active les fonctionnalités IA |
 | `AUTH_URL` | Production uniquement | URL publique de l'app (ex. `https://your-app.up.railway.app`) |
 
 ### 3. Démarrer la base de données
@@ -178,7 +178,7 @@ Le projet inclut un `Dockerfile` et un `railway.toml` pour le déploiement sur R
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 AUTH_SECRET=<openssl rand -base64 32>
 AUTH_URL=https://leaderbord.up.railway.app
-ANTHROPIC_API_KEY=<optionnel>
+GEMINI_API_KEY=<optionnel>
 ```
 
 **Seed automatique au déploiement :** le conteneur exécute `prisma db push` + `prisma db seed` (32 élèves) au démarrage. Si le seed échoue, `/api/health` le relance tant que la base est vide.
