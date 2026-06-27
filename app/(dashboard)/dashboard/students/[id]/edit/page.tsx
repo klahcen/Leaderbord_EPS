@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { EditStudentForm } from "./EditStudentForm";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function EditStudentPage({ params }: PageProps) {
+  const { id } = await params;
   const [student, classes] = await Promise.all([
-    prisma.student.findUnique({ where: { id: params.id } }),
+    prisma.student.findUnique({ where: { id } }),
     prisma.schoolClass.findMany({ orderBy: { name: "asc" } }),
   ]);
 

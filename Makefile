@@ -1,7 +1,7 @@
 # PE Dashboard — local dev & Railway deploy helpers
 # Railway: uses Dockerfile (see railway.toml) — push to GitHub to redeploy
 
-.PHONY: help install lock dev build start lint clean \
+.PHONY: help install lock dev build start lint clean restart \
         db-generate db-push db-seed db-studio db-setup \
         db-push-railway db-seed-railway \
         railway-build railway-start env-check \
@@ -22,6 +22,8 @@ lock: ## Refresh package-lock.json after package.json changes
 
 clean: ## Delete .next cache (fixes MODULE_NOT_FOUND / stale webpack errors)
 	rm -rf .next
+
+restart: clean dev ## Clear Next.js cache and restart dev server
 
 dev: ## Run Next.js dev server
 	$(NPM) run dev

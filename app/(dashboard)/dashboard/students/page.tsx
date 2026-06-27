@@ -10,24 +10,23 @@ import ClassList from "@/components/ClassList";
 import { Button } from "@/components/ui/button";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     search?: string;
     classId?: string;
     gender?: string;
     page?: string;
-  };
+  }>;
 }
 
 const PAGE_SIZE = 10;
 
 export default async function StudentsPage({ searchParams }: PageProps) {
+  const { search, classId, gender, page: pageParam } = await searchParams;
   const t = await getTranslations("students");
-  const page = Math.max(1, parseInt(searchParams.page ?? "1", 10));
-  const search = searchParams.search ?? "";
-  const classId = searchParams.classId;
-  const gender = searchParams.gender;
+  const page = Math.max(1, parseInt(pageParam ?? "1", 10));
+  const searchQuery = search ?? "";
 
-  const filters = { search, classId, gender };
+  const filters = { search: searchQuery, classId, gender };
 
   const [rows, total, classes] = await Promise.all([
     getStudentScoreRows({
@@ -54,7 +53,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
       <Suspense fallback={<div className="h-10" />}>
         <StudentsFilter
           classes={classes}
-          current={{ search, classId, gender }}
+          current={{ search: searchQuery, classId, gender }}
         />
       </Suspense>
 
@@ -67,7 +66,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
           {page > 1 && (
             <Button variant="outline" size="sm" asChild>
               <Link
-                href={`/dashboard/students?page=${page - 1}&search=${search}&classId=${classId ?? ""}&gender=${gender ?? ""}`}
+                href={`/dashboard/students?page=${page - 1}&search=${searchQuery}&classId=${classId ?? ""}&gender=${gender ?? ""}`}
               >
                 {t("previous")}
               </Link>
@@ -79,7 +78,7 @@ export default async function StudentsPage({ searchParams }: PageProps) {
           {page < totalPages && (
             <Button variant="outline" size="sm" asChild>
               <Link
-                href={`/dashboard/students?page=${page + 1}&search=${search}&classId=${classId ?? ""}&gender=${gender ?? ""}`}
+                href={`/dashboard/students?page=${page + 1}&search=${searchQuery}&classId=${classId ?? ""}&gender=${gender ?? ""}`}
               >
                 {t("next")}
               </Link>

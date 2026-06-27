@@ -5,6 +5,42 @@ import { flattenGridEntries } from "@/lib/evaluation-grid";
 
 const CANONICAL_CLASS_CODES = ["CLA001", "CLA002", "CLA003"] as const;
 
+/** Official class roster — upserted on every `npm run db:seed`. */
+export const SEED_STUDENT_ROSTER = [
+  "Fatima Zahra Habchan",
+  "Omar Lbaz",
+  "Salma Ben Sayeh",
+  "Aya Bomya",
+  "Ichrak Lmadani",
+  "Homid Mohamed",
+  "Mohamed Ali Abohafs",
+  "Romaisa Bahsin",
+  "Salima L3idawi",
+  "Amin Daif",
+  "Farah Zahi",
+  "Fatima Zahra Ben Khayi",
+  "Yassir Adhiba",
+  "Rihab Kzibri",
+  "Idrissi Ismail",
+  "Yahya Ben Mherer",
+  "Wiam Belmahdu",
+  "Kawtar Sidki",
+  "Ferkak Ziyad",
+  "Safae Elmansour",
+  "Lbodali Yasmine",
+  "Anas Laerousi",
+  "Lkhalili Said",
+  "Lkrin Adnan",
+  "Mohamed Yassir Lfkayhi",
+  "Aelal Iman",
+  "Bokar Romaisa",
+  "Lfiyadi Charaf Din",
+  "Boh Mohamed Rayan",
+  "Farok Rayan",
+  "Sara Amloul",
+  "Ayet Ben Idar Yahya",
+] as const;
+
 const DEFAULT_SUB_BY_FAMILY: Record<ActivityFamily, SubActivity> = {
   ATHLETISME: "COURSE_VITESSE",
   SPORTS_COLLECTIFS: "FOOTBALL",
@@ -54,19 +90,27 @@ export async function upsertSchoolClasses() {
   ]);
 }
 
-export async function upsertSeedStudent(index: number, classId: string) {
+export async function upsertSeedStudent(
+  index: number,
+  name: string,
+  classId: string
+) {
   const code = `STU${String(index + 1).padStart(3, "0")}`;
   return prisma.student.upsert({
     where: { studentCode: code },
-    update: {},
+    update: { name, classId },
     create: {
-      name: `Student ${index + 1}`,
+      name,
       studentCode: code,
       schoolClass: { connect: { id: classId } },
       age: 12 + (index % 5),
       gender: (index % 2 === 0 ? "MALE" : "FEMALE") as Gender,
     },
   });
+}
+
+export function getSeedStudentRoster() {
+  return SEED_STUDENT_ROSTER;
 }
 
 const GRID_ENTRIES = flattenGridEntries().map((entry) => ({

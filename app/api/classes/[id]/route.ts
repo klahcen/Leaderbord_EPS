@@ -4,15 +4,16 @@ import { prisma } from "@/lib/prisma";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
   try {
     const cls = await prisma.schoolClass.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name?.trim(),
         code: body.code?.trim(),
@@ -26,8 +27,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -36,11 +38,11 @@ export async function DELETE(
 
   if (mode === "cascade") {
     await prisma.$transaction([
-      prisma.student.deleteMany({ where: { classId: params.id } }),
-      prisma.schoolClass.delete({ where: { id: params.id } }),
+      prisma.student.deleteMany({ where: { classId: id } }),
+      prisma.schoolClass.delete({ where: { id } }),
     ]);
   } else {
-    await prisma.schoolClass.delete({ where: { id: params.id } });
+    await prisma.schoolClass.delete({ where: { id } });
   }
 
   return NextResponse.json({ success: true });

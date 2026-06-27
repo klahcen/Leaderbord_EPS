@@ -14,22 +14,24 @@ import { Badge } from "@/components/ui/badge";
 import type { KnowledgeDomain } from "@prisma/client";
 
 interface PageProps {
-  params: { id: string };
-  searchParams: { category?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ category?: string }>;
 }
 
 export default async function StudentDetailPage({
   params,
   searchParams,
 }: PageProps) {
+  const { id } = await params;
+  const { category } = await searchParams;
   const t = await getTranslations("students");
   const tEval = await getTranslations("evaluation");
   const tAct = await getTranslations("activities");
   const format = await getFormatter();
-  const domainFilter = parseLeaderboardCategory(searchParams.category);
+  const domainFilter = parseLeaderboardCategory(category);
 
   const student = await prisma.student.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       schoolClass: true,
       progressLogs: {

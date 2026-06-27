@@ -5,10 +5,11 @@ import { ProgressForm } from "@/components/dashboard/ProgressForm";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface PageProps {
-  searchParams: { studentId?: string };
+  searchParams: Promise<{ studentId?: string }>;
 }
 
 export default async function ProgressPage({ searchParams }: PageProps) {
+  const { studentId } = await searchParams;
   const t = await getTranslations("progress");
 
   const students = await prisma.student.findMany({
@@ -16,9 +17,7 @@ export default async function ProgressPage({ searchParams }: PageProps) {
     orderBy: { name: "asc" },
   });
 
-  const initialData = searchParams.studentId
-    ? { studentId: searchParams.studentId }
-    : undefined;
+  const initialData = studentId ? { studentId } : undefined;
 
   return (
     <div>

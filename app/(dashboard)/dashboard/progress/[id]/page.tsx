@@ -8,12 +8,13 @@ import { Card, CardContent } from "@/components/ui/card";
 export default async function EditProgressPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const t = await getTranslations("progress");
 
   const [log, students] = await Promise.all([
-    prisma.progressLog.findUnique({ where: { id: params.id } }),
+    prisma.progressLog.findUnique({ where: { id } }),
     prisma.student.findMany({
       select: { id: true, name: true, studentCode: true },
       orderBy: { name: "asc" },

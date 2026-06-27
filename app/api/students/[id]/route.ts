@@ -4,13 +4,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const student = await prisma.student.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       schoolClass: true,
       progressLogs: { orderBy: { recordedAt: "desc" } },
@@ -23,15 +24,16 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
   try {
     const student = await prisma.student.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name?.trim(),
         studentCode: body.studentCode?.trim(),
@@ -51,11 +53,12 @@ export async function PUT(
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await prisma.student.delete({ where: { id: params.id } });
+  await prisma.student.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }

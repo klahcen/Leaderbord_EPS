@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   createProgressLog,
   getSeedGridEntries,
+  getSeedStudentRoster,
   getSeedSubActivities,
   upsertSchoolClasses,
   upsertSeedStudent,
@@ -34,11 +35,16 @@ async function main() {
 
   const classRecords = await upsertSchoolClasses();
   const studentRecords = [];
+  const roster = getSeedStudentRoster();
   const gridEntries = getSeedGridEntries();
   const subActivities = getSeedSubActivities();
 
-  for (let i = 0; i < 10; i++) {
-    const student = await upsertSeedStudent(i, classRecords[i % 3].id);
+  for (let i = 0; i < roster.length; i++) {
+    const student = await upsertSeedStudent(
+      i,
+      roster[i],
+      classRecords[i % classRecords.length].id
+    );
     studentRecords.push(student);
   }
 
@@ -94,7 +100,7 @@ async function main() {
   }
 
   console.log(
-    "Seed completed: 1 professor, 3 classes, 10 students, Moroccan EPS activity logs"
+    `Seed completed: 1 professor, 3 classes, ${roster.length} students, Moroccan EPS activity logs`
   );
   console.log(`Professor login — email: ${professorEmail}  password: ${professorPassword}`);
 }

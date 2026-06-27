@@ -24,12 +24,12 @@ const getCachedAllLeaderboards = unstable_cache(
 export default async function LeaderboardPage({
   searchParams,
 }: {
-  searchParams: { category?: string };
+  searchParams: Promise<{ category?: string }>;
 }) {
+  const { category } = await searchParams;
   const t = await getTranslations("leaderboard");
-  const initialCategory: LeaderboardCategory = parseLeaderboardCategory(
-    searchParams.category
-  );
+  const initialCategory: LeaderboardCategory =
+    parseLeaderboardCategory(category);
   const dataByCategory = await getCachedAllLeaderboards();
 
   return (
