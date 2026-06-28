@@ -4,6 +4,7 @@ import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { DeveloperFooter } from "@/components/DeveloperFooter";
 
 export const metadata: Metadata = {
   title: "PE Dashboard — Physical Education Leaderboard",
@@ -26,7 +27,12 @@ export default async function RootLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <SessionProvider>
-            <ThemeProvider>{children}</ThemeProvider>
+            <ThemeProvider>
+              <div className="flex min-h-screen flex-col">
+                <div className="flex-1">{children}</div>
+                <DeveloperFooter />
+              </div>
+            </ThemeProvider>
           </SessionProvider>
         </NextIntlClientProvider>
       </body>

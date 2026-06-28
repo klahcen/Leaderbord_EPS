@@ -1131,6 +1131,61 @@
   background: var(--color-surface);
 }
 
+/* ── Developer footer ── */
+.developer-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.developer-footer-label {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.developer-footer-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.developer-footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  background: var(--color-surface-offset);
+  text-decoration: none;
+  transition: color var(--transition-interactive),
+    border-color var(--transition-interactive),
+    background var(--transition-interactive),
+    transform var(--transition-interactive);
+}
+
+.developer-footer-link:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.developer-footer-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* ── RTL ── */
 [dir="rtl"] .sidebar {
   border-left: none;
