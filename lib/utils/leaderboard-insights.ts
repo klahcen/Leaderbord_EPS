@@ -3,6 +3,7 @@ import {
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
+import { markOutOf20ToGradeLabel } from "@/lib/utils/qualitative-grades";
 import type { LeaderboardEntry } from "@/types";
 
 export async function generateLeaderboardInsights(
@@ -23,7 +24,7 @@ export async function generateLeaderboardInsights(
       prompt: `You are a PE coach celebrating student achievements. ${languageInstruction}
 
 Top 5 students this week:
-${top5.map((s, i) => `${i + 1}. ${s.name} — ${s.avgScore}% avg score`).join("\n")}
+${top5.map((s, i) => `${i + 1}. ${s.name} — ${markOutOf20ToGradeLabel(s.avgScore, locale)}`).join("\n")}
 
 Most improved (trending up):
 ${mostImproved.map((s) => `- ${s.name} (↑ improving)`).join("\n") || "— none this week"}

@@ -111,3 +111,32 @@ export function getQualitativeGradeLabel(
 export function markOutOf20ToGradeLabel(mark: number, locale: string): string {
   return getQualitativeGradeLabel(markOutOf20ToQualitativeGrade(mark), locale);
 }
+
+export function scoreToGradeLabel(
+  score: number,
+  iacMax: number,
+  locale: string
+): string {
+  return getQualitativeGradeLabel(scoreToQualitativeGrade(score, iacMax), locale);
+}
+
+export function qualitativeGradeToIndex(grade: QualitativeGrade): number {
+  return QUALITATIVE_GRADES.indexOf(grade) + 1;
+}
+
+export function markOutOf20ToGradeIndex(mark: number): number {
+  return qualitativeGradeToIndex(markOutOf20ToQualitativeGrade(mark));
+}
+
+export function getQualitativeGradingInstruction(locale: string): string {
+  const labels = GRADE_LABELS[locale] ?? GRADE_LABELS.en;
+  const scale = Object.values(labels).join(", ");
+
+  if (locale === "fr") {
+    return `Utilise UNIQUEMENT cette échelle d'appréciation pour toutes les notes (jamais de chiffres, /20, pourcentages ni scores numériques) : ${scale}.`;
+  }
+  if (locale === "ar") {
+    return `استخدم فقط مقياس التقييم التالي لجميع الدرجات (بدون أرقام أو /20 أو نسب مئوية): ${scale}.`;
+  }
+  return `Use ONLY this qualitative rating scale for all grades (never numbers, /20, percentages, or numeric scores): ${scale}.`;
+}

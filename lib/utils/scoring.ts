@@ -2,6 +2,8 @@ import { calculateMarkOutOf20, calculateLogPercent } from "@/lib/utils/moroccan-
 
 export { calculateMarkOutOf20, calculateLogPercent };
 
-export function formatMarkOutOf20(mark: number): string {
-  return `${mark.toFixed(2)}/20`;
+import { markOutOf20ToGradeLabel } from "@/lib/utils/qualitative-grades";
+
+export function formatMarkOutOf20(mark: number, locale = "fr"): string {
+  return markOutOf20ToGradeLabel(mark, locale);
 }

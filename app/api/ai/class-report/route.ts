@@ -5,6 +5,8 @@ import {
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
+import { formatMarkForAI } from "@/lib/ai/qualitative-context";
+import { getQualitativeGradingInstruction } from "@/lib/utils/qualitative-grades";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
@@ -41,13 +43,15 @@ export async function POST(req: Request) {
         totalMax > 0
           ? ((totalScore / totalMax) * 20).toFixed(2)
           : "no data";
-      return `- ${s.name} (${s.schoolClass?.name ?? "No class"}): mark ${avg}/20, ${s.progressLogs.length} recent logs`;
+      return `- ${s.name} (${s.schoolClass?.name ?? "No class"}): ${formatMarkForAI(avg, locale)}, ${s.progressLogs.length} recent logs`;
     })
     .join("\n");
 
   const languageInstruction = getLanguageInstruction(locale);
+  const gradingInstruction = getQualitativeGradingInstruction(locale);
 
   const prompt = `You are a Physical Education department coordinator. ${languageInstruction}
+${gradingInstruction}
 
 Here is this week's class progress data:
 

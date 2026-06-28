@@ -10,6 +10,7 @@ import {
 import { LeaderboardClient } from "@/components/leaderboard/LeaderboardClient";
 import { LeaderboardHero } from "@/components/leaderboard/LeaderboardHero";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { DeveloperLinks } from "@/components/DeveloperLinks";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/providers/ThemeProvider";
 
@@ -36,12 +37,15 @@ export default async function LeaderboardPage({
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
-          <Link
-            href="/leaderboard"
-            className="sidebar-logo shrink-0 !p-0 text-base md:text-lg"
-          >
-            PE <span>Sport</span>
-          </Link>
+          <div className="flex min-w-0 items-center gap-3">
+            <DeveloperLinks className="md:hidden" />
+            <Link
+              href="/leaderboard"
+              className="sidebar-logo shrink-0 !p-0 text-base md:text-lg"
+            >
+              PE <span>Sport</span>
+            </Link>
+          </div>
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
             <LanguageSwitcher />
             <ThemeToggle />

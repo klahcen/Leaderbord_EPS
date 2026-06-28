@@ -7,15 +7,16 @@ import {
 } from "@google/generative-ai";
 
 export const GEMINI_MODELS = {
-  FLASH: "gemini-2.0-flash-lite",
-  FALLBACK: "gemini-1.5-flash",
+  PRIMARY: "gemini-2.5-flash-lite",
+  FLASH: "gemini-2.5-flash",
+  FALLBACK: "gemini-flash-latest",
 } as const;
 
 const MODEL_CHAIN = [
   process.env.GEMINI_MODEL,
+  GEMINI_MODELS.PRIMARY,
   GEMINI_MODELS.FLASH,
   GEMINI_MODELS.FALLBACK,
-  "gemini-2.0-flash",
 ].filter(
   (model, index, list): model is string =>
     Boolean(model) && list.indexOf(model) === index
@@ -42,6 +43,17 @@ export function requireGemini() {
 function isQuotaError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
   return msg.includes("429") || msg.toLowerCase().includes("quota");
+}
+
+function isRetryableModelError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return (
+    isQuotaError(err) ||
+    msg.includes("404") ||
+    msg.toLowerCase().includes("not found") ||
+    msg.includes("503") ||
+    msg.toLowerCase().includes("unavailable")
+  );
 }
 
 export function formatGeminiError(err: unknown, locale = "en"): string {
@@ -107,7 +119,7 @@ async function withModelFallback<T>(
       return await run(model);
     } catch (err) {
       lastError = err;
-      if (!isQuotaError(err)) throw err;
+      if (!isRetryableModelError(err)) throw err;
     }
   }
 
@@ -184,7 +196,7 @@ export async function* streamText(options: {
       return;
     } catch (err) {
       lastError = err;
-      if (!isQuotaError(err)) throw err;
+      if (!isRetryableModelError(err)) throw err;
     }
   }
 

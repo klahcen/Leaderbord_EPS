@@ -22,8 +22,8 @@ export default async function ProgressPage({ searchParams }: PageProps) {
   return (
     <div>
       <Header title={t("title")} description={t("description")} />
-      <Card className="max-w-3xl">
-        <CardContent className="pt-6">
+      <Card className="w-full max-w-3xl">
+        <CardContent className="px-4 pt-6 sm:px-6">
           <ProgressForm students={students} initialData={initialData} />
         </CardContent>
       </Card>

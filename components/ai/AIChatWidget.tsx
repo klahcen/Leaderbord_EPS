@@ -66,7 +66,7 @@ export function AIChatWidget() {
         type="button"
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          "fixed bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:bottom-6",
+          "fixed bottom-[5.5rem] right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 md:bottom-6",
           open && "scale-0 opacity-0"
         )}
         aria-label={t("openChat")}
@@ -75,7 +75,7 @@ export function AIChatWidget() {
       </button>
 
       {open && (
-        <div className="fixed bottom-20 right-4 z-50 flex h-[min(520px,80vh)] w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border bg-card shadow-2xl md:bottom-6">
+        <div className="fixed bottom-[5.5rem] right-4 z-50 flex h-[min(520px,calc(100dvh-7rem))] w-[min(380px,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border bg-card shadow-2xl md:bottom-6 md:h-[min(520px,80vh)]">
           <div className="flex items-center justify-between border-b bg-primary px-4 py-3 text-primary-foreground">
             <div>
               <p className="font-semibold">{t("chatTitle")}</p>

@@ -277,7 +277,7 @@ export function ProgressForm({ students, initialData }: ProgressFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl space-y-6">
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl space-y-6">
       <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
         <Label>{t("aiAutoFill")}</Label>
         <textarea

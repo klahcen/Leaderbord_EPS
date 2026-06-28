@@ -6,6 +6,8 @@ import {
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
+import { formatScoreForAI } from "@/lib/ai/qualitative-context";
+import { getQualitativeGradingInstruction } from "@/lib/utils/qualitative-grades";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -42,16 +44,18 @@ export async function POST(req: NextRequest) {
   const logsSummary = student.progressLogs
     .map(
       (l) =>
-        `${l.recordedAt.toDateString()} | ${l.knowledgeDomain}/${l.criteria} | Score: ${l.score}/${l.iacMax} (S${l.semester})${l.notes ? ` | ${l.notes}` : ""}`
+        `${l.recordedAt.toDateString()} | ${l.knowledgeDomain}/${l.criteria} | Appréciation: ${formatScoreForAI(l.score, l.iacMax, locale)} (S${l.semester})${l.notes ? ` | ${l.notes}` : ""}`
     )
     .join("\n");
 
   const languageInstruction = getLanguageInstruction(locale);
+  const gradingInstruction = getQualitativeGradingInstruction(locale);
 
   try {
     const analysis = await generateText({
       maxOutputTokens: 1024,
       prompt: `You are an expert Physical Education coach and sports analyst. ${languageInstruction}
+${gradingInstruction}
 
 Here is the progress data for student **${student.name}** (Class: ${student.schoolClass?.name ?? "No class"}, Code: ${student.studentCode}):
 
@@ -66,7 +70,7 @@ Please provide:
 4. **Personalized Training Plan** — 3 specific weekly recommendations to help this student improve
 5. **Motivational Note** — a short encouraging message for the student
 
-Be specific and data-driven. Reference actual scores in your analysis. Keep it concise (under 400 words). Use markdown when helpful.`,
+Be specific and data-driven. Reference qualitative appreciation levels in your analysis. Keep it concise (under 400 words). Use markdown when helpful.`,
     });
 
     return NextResponse.json({ analysis });

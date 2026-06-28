@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations, getFormatter } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { parseLeaderboardCategory } from "@/lib/constants/leaderboard-categories";
 import { calculateMarkOutOf20 } from "@/lib/utils/moroccan-scoring";
@@ -8,6 +8,7 @@ import { Header } from "@/components/dashboard/Header";
 import { ProgressLineChart } from "@/components/dashboard/ProgressChart";
 import { StudentProgressFilter } from "@/components/dashboard/StudentProgressFilter";
 import { AIAnalysisButton } from "@/components/dashboard/AIAnalysisButton";
+import { QualitativeGradeDisplay } from "@/components/QualitativeGradeDisplay";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { KnowledgeDomain } from "@prisma/client";
@@ -25,7 +26,6 @@ export default async function StudentDetailPage({
   const { category } = await searchParams;
   const t = await getTranslations("students");
   const tEval = await getTranslations("evaluation");
-  const format = await getFormatter();
   const domainFilter = parseLeaderboardCategory(category);
 
   const student = await prisma.student.findUnique({
@@ -57,7 +57,7 @@ export default async function StudentDetailPage({
         title={student.name}
         description={`${student.schoolClass?.name ?? "—"} · ${student.studentCode}`}
       >
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" asChild>
             <Link href={`/dashboard/students/${student.id}/edit`}>
               {t("editStudent")}
@@ -93,13 +93,11 @@ export default async function StudentDetailPage({
           )}
           <div>
             <p className="text-sm text-muted-foreground">{tEval("finalMark")}</p>
-            <p className="text-2xl font-bold text-primary">
-              {format.number(markOutOf20, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-              /20
-            </p>
+            <QualitativeGradeDisplay
+              markOutOf20={markOutOf20}
+              showBar={false}
+              labelClassName="text-2xl font-bold text-primary"
+            />
           </div>
         </CardContent>
       </Card>

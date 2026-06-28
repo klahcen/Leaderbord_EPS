@@ -53,13 +53,13 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
         onKeyDown={(e) => {
           if (e.key === "Enter") applyFilters({ search });
         }}
-        className="max-w-xs"
+        className="w-full sm:max-w-xs"
       />
       <Select
         value={current.classId ?? "all"}
         onValueChange={(v) => applyFilters({ classId: v === "all" ? "" : v })}
       >
-        <SelectTrigger className="w-48">
+        <SelectTrigger className="w-full sm:w-48">
           <SelectValue placeholder={t("class")} />
         </SelectTrigger>
         <SelectContent>
@@ -75,7 +75,7 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
         value={current.gender ?? "all"}
         onValueChange={(v) => applyFilters({ gender: v === "all" ? "" : v })}
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger className="w-full sm:w-40">
           <SelectValue placeholder={t("gender")} />
         </SelectTrigger>
         <SelectContent>
@@ -85,7 +85,7 @@ export function StudentsFilter({ classes, current }: StudentsFilterProps) {
           <SelectItem value="OTHER">{t("other")}</SelectItem>
         </SelectContent>
       </Select>
-      <Button onClick={() => applyFilters({ search })}>{t("search")}</Button>
+      <Button className="w-full sm:w-auto" onClick={() => applyFilters({ search })}>{t("search")}</Button>
     </div>
   );
 }

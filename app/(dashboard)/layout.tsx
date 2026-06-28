@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/dashboard/Sidebar";
 import { ThemeToggle } from "@/components/providers/ThemeProvider";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { AIChatWidget } from "@/components/ai/AIChatWidget";
+import { DeveloperLinks } from "@/components/DeveloperLinks";
 
 export default function DashboardLayout({
   children,
@@ -11,12 +12,15 @@ export default function DashboardLayout({
   return (
     <div className="dashboard-layout">
       <Sidebar />
-      <div className="flex min-h-screen flex-1 flex-col pb-20 md:pb-0">
+      <div className="dashboard-main flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
         <div className="dashboard-topbar">
-          <LanguageSwitcher />
-          <ThemeToggle />
+          <DeveloperLinks className="md:hidden" />
+          <div className="dashboard-topbar-actions">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </div>
-        <main className="dashboard-content flex-1 overflow-auto">{children}</main>
+        <main className="dashboard-content flex-1 overflow-x-hidden">{children}</main>
       </div>
       <AIChatWidget />
     </div>

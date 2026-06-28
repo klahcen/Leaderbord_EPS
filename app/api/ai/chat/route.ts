@@ -6,6 +6,11 @@ import {
   isGeminiConfigured,
 } from "@/lib/gemini";
 import { getLanguageInstruction } from "@/lib/claude-language";
+import {
+  formatMarkForAI,
+  formatScoreForAI,
+} from "@/lib/ai/qualitative-context";
+import { getQualitativeGradingInstruction } from "@/lib/utils/qualitative-grades";
 import { prisma } from "@/lib/prisma";
 
 interface ChatMessage {
@@ -48,7 +53,7 @@ export async function POST(req: NextRequest) {
   const recentActivity = recentLogs
     .map(
       (l) =>
-        `${l.student.name} (${l.student.schoolClass?.name ?? "No class"}): ${l.criteria} ${l.score}/${l.iacMax}`
+        `${l.student.name} (${l.student.schoolClass?.name ?? "No class"}): ${l.criteria} ${formatScoreForAI(l.score, l.iacMax, locale)}`
     )
     .join("; ");
 
@@ -60,14 +65,16 @@ export async function POST(req: NextRequest) {
         totalMax > 0
           ? ((totalScore / totalMax) * 20).toFixed(2)
           : "N/A";
-      return `${s.name} (${s.schoolClass?.name ?? "No class"}): ${avg}/20`;
+      return `${s.name} (${s.schoolClass?.name ?? "No class"}): ${formatMarkForAI(avg, locale)}`;
     })
     .join("\n");
 
   const languageInstruction = getLanguageInstruction(locale);
+  const gradingInstruction = getQualitativeGradingInstruction(locale);
   const professorName = session.user?.name ?? "Professor";
 
   const systemPrompt = `You are an AI assistant for a Physical Education professor named ${professorName}. ${languageInstruction}
+${gradingInstruction}
 
 You have access to real-time class data:
 - Total students: ${studentCount}

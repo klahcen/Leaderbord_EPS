@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations, getFormatter } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { startOfWeek } from "date-fns";
 import { Users, ClipboardList, TrendingUp, Award } from "lucide-react";
 import { prisma } from "@/lib/prisma";
@@ -15,6 +15,7 @@ import { CategoryBarChart } from "@/components/dashboard/ProgressChart";
 import { WeeklyReportButton } from "@/components/dashboard/WeeklyReportButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { markOutOf20ToGradeLabel } from "@/lib/utils/qualitative-grades";
 
 async function getDashboardData() {
   const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -75,7 +76,7 @@ async function getDashboardData() {
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
-  const format = await getFormatter();
+  const locale = await getLocale();
   const data = await getDashboardData();
 
   return (
@@ -97,7 +98,7 @@ export default async function DashboardPage() {
         />
         <StatsCard
           title={t("avgScore")}
-          value={`${format.number(data.classAvg, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/20`}
+          value={markOutOf20ToGradeLabel(data.classAvg, locale)}
           icon={TrendingUp}
           highlight
         />
@@ -107,10 +108,7 @@ export default async function DashboardPage() {
           description={
             data.topStudent
               ? t("topStudentDesc", {
-                  score: format.number(data.topStudent.avgScore, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  }),
+                  grade: markOutOf20ToGradeLabel(data.topStudent.avgScore, locale),
                 })
               : undefined
           }
@@ -132,16 +130,16 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>{t("scoreByCategory")}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="chart-responsive">
             <CategoryBarChart data={data.categoryChartData} />
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>{t("top5")}</CardTitle>
-          <Button variant="outline" size="sm" asChild>
+          <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
             <Link href="/dashboard/students">{t("viewAll")}</Link>
           </Button>
         </CardHeader>

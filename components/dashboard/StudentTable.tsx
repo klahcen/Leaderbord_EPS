@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useTranslations, useFormatter } from "next-intl";
 import { Pencil, Trash2 } from "lucide-react";
+import {
+  QualitativeGradeDisplay,
+  QualitativeGradeLabel,
+} from "@/components/QualitativeGradeDisplay";
 import { deleteStudent } from "@/lib/actions/student.actions";
+import { scoreToQualitativeGrade } from "@/lib/utils/qualitative-grades";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 interface StudentRow {
@@ -14,6 +19,65 @@ interface StudentRow {
   studentCode: string;
   className: string;
   avgScore: number;
+}
+
+function StudentCardList({
+  students,
+  showActions,
+  onDelete,
+}: {
+  students: StudentRow[];
+  showActions: boolean;
+  onDelete: (id: string) => void;
+}) {
+  const t = useTranslations("students");
+  const tCommon = useTranslations("common");
+
+  return (
+    <div className="student-cards space-y-3 md:hidden">
+      {students.map((student) => (
+        <article key={student.id} className="student-card">
+          <div className="student-card-header">
+            <div className="student-card-identity min-w-0">
+              <Link
+                href={`/dashboard/students/${student.id}`}
+                className="student-card-name"
+              >
+                {student.name}
+              </Link>
+              <p className="student-card-meta">{student.studentCode}</p>
+            </div>
+            <span className="badge-neutral shrink-0">{student.className}</span>
+          </div>
+          <div className="student-card-footer">
+            <div className="student-card-grade">
+              <span className="student-card-grade-label">{t("avgScore")}</span>
+              <QualitativeGradeLabel markOutOf20={student.avgScore} />
+            </div>
+            {showActions && (
+              <div className="flex shrink-0 gap-1">
+                <Link
+                  href={`/dashboard/students/${student.id}/edit`}
+                  className="btn btn-ghost p-2"
+                  aria-label={tCommon("edit")}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Link>
+                <button
+                  type="button"
+                  className="btn btn-ghost p-2 text-destructive"
+                  onClick={() => onDelete(student.id)}
+                  aria-label={tCommon("delete")}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  );
 }
 
 export function StudentTable({
@@ -26,7 +90,6 @@ export function StudentTable({
   const router = useRouter();
   const t = useTranslations("students");
   const tCommon = useTranslations("common");
-  const format = useFormatter();
   const [isPending, startTransition] = useTransition();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -47,16 +110,32 @@ export function StudentTable({
 
   return (
     <>
-      <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
+      <StudentCardList
+        students={students}
+        showActions={showActions}
+        onDelete={setDeleteId}
+      />
+
+      <div className="student-table-wrap hidden overflow-x-auto rounded-lg border md:block">
+        <table className="student-table w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="px-4 py-3 text-left font-medium">{t("name")}</th>
-              <th className="px-4 py-3 text-left font-medium">{t("code")}</th>
-              <th className="px-4 py-3 text-left font-medium">{t("class")}</th>
-              <th className="px-4 py-3 text-left font-medium">{t("avgScore")}</th>
+              <th className="col-name px-4 py-3 text-left font-medium">
+                {t("name")}
+              </th>
+              <th className="col-code px-4 py-3 text-left font-medium">
+                {t("code")}
+              </th>
+              <th className="col-class px-4 py-3 text-left font-medium">
+                {t("class")}
+              </th>
+              <th className="col-score px-4 py-3 text-left font-medium">
+                {t("avgScore")}
+              </th>
               {showActions && (
-                <th className="px-4 py-3 text-right font-medium">{t("actions")}</th>
+                <th className="col-actions px-4 py-3 text-right font-medium">
+                  {t("actions")}
+                </th>
               )}
             </tr>
           </thead>
@@ -66,7 +145,7 @@ export function StudentTable({
                 key={student.id}
                 className="border-b transition-colors hover:bg-muted/30"
               >
-                <td className="px-4 py-3">
+                <td className="col-name px-4 py-3">
                   <Link
                     href={`/dashboard/students/${student.id}`}
                     className="font-medium text-primary hover:underline"
@@ -74,31 +153,20 @@ export function StudentTable({
                     {student.name}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-muted-foreground">
+                <td className="col-code px-4 py-3 text-muted-foreground">
                   {student.studentCode}
                 </td>
-                <td className="px-4 py-3">{student.className}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="score-bar-track w-24">
-                      <span
-                        className={`score-bar-fill ${student.avgScore >= 14 ? "high" : student.avgScore >= 10 ? "medium" : "low"}`}
-                        style={{
-                          width: `${Math.min(Math.max((student.avgScore / 20) * 100, 0), 100)}%`,
-                        }}
-                      />
-                    </div>
-                    <span>
-                      {format.number(student.avgScore, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                      /20
-                    </span>
-                  </div>
+                <td className="col-class px-4 py-3">
+                  <span className="badge-neutral">{student.className}</span>
+                </td>
+                <td className="col-score px-4 py-3">
+                  <QualitativeGradeDisplay
+                    markOutOf20={student.avgScore}
+                    compact
+                  />
                 </td>
                 {showActions && (
-                  <td className="px-4 py-3">
+                  <td className="col-actions px-4 py-3">
                     <div className="flex justify-end gap-1">
                       <Link
                         href={`/dashboard/students/${student.id}/edit`}
@@ -166,17 +234,19 @@ export function RecentActivityFeed({
       {logs.map((log) => (
         <li
           key={log.id}
-          className="flex items-center justify-between rounded-lg border p-3"
+          className="activity-feed-item flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
         >
-          <div>
+          <div className="min-w-0">
             <p className="font-medium">{log.studentName}</p>
             <p className="text-sm text-muted-foreground">
               {tEval(`criteriaLabels.${log.criteria as "HABILETE_MOTRICE"}`)}
             </p>
           </div>
-          <div className="text-right">
+          <div className="shrink-0 sm:text-right">
             <p className="font-semibold text-primary">
-              {tEval("scoreOutOf", { score: log.score, max: log.iacMax })}
+              {tEval(
+                `gradeLevels.${scoreToQualitativeGrade(log.score, log.iacMax)}`
+              )}
             </p>
             <p className="text-xs text-muted-foreground">
               {format.dateTime(new Date(log.recordedAt), { dateStyle: "medium" })}
